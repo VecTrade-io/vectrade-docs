@@ -1,0 +1,166 @@
+---
+title: "CLI"
+description: "Install and use the VecTrade command-line interface"
+---
+
+## Installation
+
+<Tabs>
+  <Tab title="Homebrew">
+    ```bash
+    brew install VecTrade-io/vectrade/vectrade
+    ```
+  </Tab>
+  <Tab title="npm">
+    ```bash
+    npm install -g vectrade-cli
+    ```
+  </Tab>
+  <Tab title="pip">
+    ```bash
+    pip install vectrade-cli
+    ```
+  </Tab>
+  <Tab title="Scoop (Windows)">
+    ```powershell
+    scoop bucket add vectrade https://github.com/VecTrade-io/scoop-vectrade
+    scoop install vectrade
+    ```
+  </Tab>
+  <Tab title="Shell">
+    ```bash
+    curl -fsSL https://get.vectrade.io | sh
+    ```
+  </Tab>
+</Tabs>
+
+## Authentication
+
+```bash
+# Interactive login (opens browser)
+vectrade auth login
+
+# Or set via environment variable
+export VECTRADE_API_KEY=vq_live_...
+```
+
+## Commands
+
+### Market Data
+
+```bash
+# Real-time quote
+vectrade quote AAPL
+
+# With specific fields
+vectrade quote AAPL --fields price,volume,change
+
+# JSON output
+vectrade quote AAPL --output json
+
+# CSV output (for piping)
+vectrade quote AAPL --output csv
+```
+
+### AI Analysis
+
+```bash
+# Streaming AI analysis
+vectrade ai "Analyze MSFT earnings trend"
+
+# Compare stocks
+vectrade ai "Compare AAPL vs GOOGL for 2026"
+```
+
+### API Key Management
+
+```bash
+# Create a new key
+vectrade keys create --label "production"
+
+# List all keys
+vectrade keys list
+
+# Revoke a key
+vectrade keys revoke key_abc123
+```
+
+### MCP IDE Setup
+
+```bash
+# Auto-configure Cursor IDE
+vectrade mcp setup cursor
+
+# Auto-configure VS Code
+vectrade mcp setup vscode
+
+# Auto-configure Claude Desktop
+vectrade mcp setup claude
+```
+
+### Webhooks
+
+```bash
+# Listen for webhook events locally (for development)
+vectrade webhook listen
+
+# Create a webhook subscription
+vectrade webhook create --url https://example.com/hook --events quote.alert,trade.fill
+
+# List subscriptions
+vectrade webhook list
+
+# Delete a subscription
+vectrade webhook delete whk_abc123
+```
+
+### Usage & Billing
+
+```bash
+# View current month usage
+vectrade usage
+
+# View API quota status
+vectrade usage --this-month
+```
+
+### OpenAPI Spec
+
+```bash
+# Download the latest spec
+vectrade openapi download
+
+# Diff against a local spec
+vectrade openapi diff ./old-spec.yaml
+```
+
+## Configuration
+
+Config file location: `~/.vectrade/config.yaml`
+
+```yaml
+api_key: vq_live_...
+base_url: https://api.vectrade.io/v1
+output: table        # table | json | csv
+timeout: 30          # seconds
+```
+
+### Resolution Order
+
+1. Command-line flags (`--api-key`, `--sandbox`)
+2. Environment variables (`VECTRADE_API_KEY`, `VECTRADE_BASE_URL`)
+3. Config file (`~/.vectrade/config.yaml`)
+4. Defaults
+
+## Global Flags
+
+| Flag | Description |
+|------|-------------|
+| `--api-key` | Override API key |
+| `--sandbox` | Use sandbox environment |
+| `--config` | Custom config file path |
+| `--output` | Output format: `table`, `json`, `csv` |
+
+<Card title="GitHub" icon="github" href="https://github.com/VecTrade-io/vectrade-cli">
+  Source code, issues, and contributions
+</Card>

@@ -1,0 +1,129 @@
+---
+title: Error Handling
+description: Understanding VecTrade API errors, retry strategies, and best practices.
+---
+
+# Error Handling
+
+## Error Response Format
+
+All errors follow a consistent JSON structure:
+
+```json
+{
+  "error": {
+    "type": "rate_limit_error",
+    "message": "Rate limit exceeded. Please retry after 2 seconds.",
+    "docs_url": "https://docs.vectrade.io/errors/rate_limit_error"
+  },
+  "request_id": "req_abc123def456"
+}
+```
+
+## Error Types
+
+| HTTP Status | Error Type | SDK Exception | Retryable |
+|-------------|-----------|---------------|-----------|
+| 401 | `authentication_error` | `AuthenticationError` | No |
+| 403 | `permission_error` | `AuthenticationError` | No |
+| 404 | `not_found` | `NotFoundError` | No |
+| 422 | `validation_error` | `ValidationError` | No |
+| 429 | `rate_limit_error` | `RateLimitError` | Yes |
+| 429 | `quota_exceeded` | `QuotaExceededError` | No |
+| 500 | `server_error` | `ServerError` | Yes |
+| 502 | `bad_gateway` | `ServerError` | Yes |
+| 503 | `service_unavailable` | `ServerError` | Yes |
+
+## Automatic Retries
+
+The SDK automatically retries failed requests for transient errors (429, 5xx) with exponential backoff:
+
+```python
+from vectrade import VecTrade
+
+# Default: 2 retries with exponential backoff
+client = VecTrade(max_retries=3)
+
+# Disable retries
+client = VecTrade(max_retries=0)
+```
+
+### Retry Behavior
+
+- **Initial delay**: 0.5 seconds
+- **Backoff factor**: 2x (0.5s → 1s → 2s → 4s)
+- **Jitter**: ±25% randomization to prevent thundering herd
+- **Retry-After**: Server header takes precedence when present
+- **Max delay**: 30 seconds cap
+
+## Exception Hierarchy
+
+```
+VecTradeError
+├── ConfigurationError     # Missing API key, invalid config
+└── APIError               # All HTTP errors
+    ├── AuthenticationError # 401, 403
+    ├── NotFoundError      # 404
+    ├── ValidationError    # 422
+    ├── RateLimitError     # 429 (retryable)
+    ├── QuotaExceededError # 429 (not retryable)
+    └── ServerError        # 5xx
+```
+
+## Handling Errors
+
+<CodeGroup>
+```python Python
+from vectrade import VecTrade, RateLimitError, NotFoundError, APIError
+
+client = VecTrade()
+
+try:
+    quote = client.quotes.get("INVALID")
+except NotFoundError as e:
+    print(f"Symbol not found: {e.message}")
+except RateLimitError as e:
+    print(f"Rate limited. Retry after {e.retry_after}s")
+    print(f"Limit: {e.limit}, Remaining: {e.remaining}")
+except APIError as e:
+    print(f"API error {e.status_code}: {e.message}")
+    print(f"Request ID: {e.request_id}")
+```
+
+```typescript TypeScript
+import { VecTrade, NotFoundError, RateLimitError, APIError } from '@vectrade/sdk';
+
+const client = new VecTrade();
+
+try {
+  const quote = await client.quotes.get('INVALID');
+} catch (e) {
+  if (e instanceof NotFoundError) {
+    console.log(`Symbol not found: ${e.message}`);
+  } else if (e instanceof RateLimitError) {
+    console.log(`Rate limited. Retry after ${e.retryAfter}s`);
+  } else if (e instanceof APIError) {
+    console.log(`API error ${e.status}: ${e.message}`);
+  }
+}
+```
+</CodeGroup>
+
+## Request IDs
+
+Every response includes a unique `X-Request-Id` header. Include this when contacting support:
+
+```python
+except APIError as e:
+    logger.error(f"API error. Request ID: {e.request_id}")
+```
+
+## Rate Limit Headers
+
+Successful responses include rate limit information:
+
+| Header | Description |
+|--------|-------------|
+| `X-VQ-RateLimit-Limit` | Max requests per window |
+| `X-VQ-RateLimit-Remaining` | Requests remaining |
+| `X-VQ-RateLimit-Reset` | Window reset (Unix timestamp) |

@@ -1,0 +1,148 @@
+---
+title: "TypeScript SDK"
+description: "Install and use the official VecTrade TypeScript/Node.js SDK"
+---
+
+## Installation
+
+<Tabs>
+  <Tab title="npm">
+    ```bash
+    npm install @vectrade/sdk
+    ```
+  </Tab>
+  <Tab title="pnpm">
+    ```bash
+    pnpm add @vectrade/sdk
+    ```
+  </Tab>
+  <Tab title="yarn">
+    ```bash
+    yarn add @vectrade/sdk
+    ```
+  </Tab>
+</Tabs>
+
+## Runtime Support
+
+| Runtime | Version | Status |
+|---------|---------|--------|
+| Node.js | 18+ | ✅ Full support |
+| Deno | 1.28+ | ✅ Full support |
+| Bun | 1.0+ | ✅ Full support |
+| Cloudflare Workers | — | ✅ Full support |
+
+**Zero runtime dependencies** — uses native `fetch` and Web Crypto APIs.
+
+## Quick Start
+
+```typescript
+import { VecTrade } from "@vectrade/sdk";
+
+const client = new VecTrade(); // reads VECTRADE_API_KEY env var
+
+const quote = await client.quotes.get("AAPL");
+console.log(`${quote.symbol}: $${quote.price}`);
+```
+
+## Configuration
+
+```typescript
+const client = new VecTrade({
+  apiKey: "vq_live_...",   // or VECTRADE_API_KEY env var
+  baseURL: "https://...",  // custom endpoint
+  timeout: 30000,          // request timeout (ms)
+  maxRetries: 2,           // automatic retries on 429/5xx
+  sandbox: true,           // use sandbox environment
+});
+```
+
+## Resources
+
+All 11 API resource groups are available:
+
+| Resource | Methods |
+|----------|---------|
+| `client.quotes` | `get(symbol)`, `batch(symbols)` |
+| `client.fundamentals` | `get(symbol)`, `incomeStatement(symbol)`, `balanceSheet(symbol)` |
+| `client.technicals` | `get(symbol, options)` |
+| `client.news` | `list(options)`, `get(id)` |
+| `client.screener` | `screen(filters)` |
+| `client.ai` | `analyze(prompt)` — supports streaming |
+| `client.options` | `chain(symbol, options)`, `expirations(symbol)` |
+| `client.analyst` | `consensus(symbol)`, `priceTargets(symbol)`, `ratings(symbol)` |
+| `client.earnings` | `history(symbol)`, `calendar()` |
+| `client.insider` | `transactions(symbol)`, `summary(symbol)` |
+| `client.webhooks` | `create(url, events)`, `list()`, `delete(id)` |
+
+## Streaming
+
+```typescript
+const stream = await client.ai.analyze("Analyze AAPL", { stream: true });
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.content);
+}
+```
+
+## Pagination
+
+```typescript
+const paginator = client.news.list({ limit: 100 });
+
+for await (const article of paginator) {
+  console.log(article.title);
+}
+
+// Or collect all at once
+const all = await paginator.toArray();
+```
+
+## Webhook Verification
+
+```typescript
+import { verifyWebhook } from "@vectrade/sdk";
+
+const event = await verifyWebhook(rawBody, headers, secret);
+// Validates HMAC-SHA256 signature + timestamp (replay protection)
+```
+
+## Error Handling
+
+```typescript
+import { RateLimitError, NotFoundError } from "@vectrade/sdk";
+
+try {
+  const quote = await client.quotes.get("INVALID");
+} catch (err) {
+  if (err instanceof NotFoundError) {
+    console.log(`Not found (request_id: ${err.requestId})`);
+  } else if (err instanceof RateLimitError) {
+    console.log(`Rate limited, retry after ${err.retryAfter}s`);
+  }
+}
+```
+
+## Vercel AI SDK Integration
+
+```typescript
+import { createVecTrade } from "@vectrade/ai-provider";
+import { generateText } from "ai";
+
+const vt = createVecTrade();
+const result = await generateText({
+  model: yourModel,
+  tools: vt.tools(),
+  prompt: "What's AAPL trading at?",
+});
+```
+
+## Security
+
+- API key is **non-enumerable** — hidden from `console.log` and `JSON.stringify`
+- Webhook verification uses **constant-time comparison** (double-HMAC)
+- Replay protection via **timestamp tolerance window**
+
+<Card title="GitHub" icon="github" href="https://github.com/VecTrade-io/vectrade-node">
+  Source code, issues, and contributions
+</Card>

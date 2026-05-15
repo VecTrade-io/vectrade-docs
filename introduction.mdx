@@ -1,0 +1,81 @@
+---
+title: Introduction
+description: VecTrade is a comprehensive financial data platform with SDKs for Python, TypeScript, Go, and AI-native integrations.
+---
+
+# Welcome to VecTrade
+
+VecTrade provides institutional-grade financial data through a modern API designed for developers, quants, and AI agents.
+
+## What You Can Build
+
+<CardGroup cols={2}>
+  <Card title="Trading Bots" icon="robot">
+    Build automated trading strategies with real-time quotes, technical indicators, and AI analysis.
+  </Card>
+  <Card title="Portfolio Dashboards" icon="chart-line">
+    Create beautiful dashboards with live data, fundamentals, and risk metrics.
+  </Card>
+  <Card title="AI Agents" icon="brain">
+    Power financial AI agents with structured data and streaming analysis.
+  </Card>
+  <Card title="Screening Tools" icon="filter">
+    Build custom screeners with 50+ filters and real-time alerts.
+  </Card>
+</CardGroup>
+
+## Choose Your SDK
+
+<CardGroup cols={3}>
+  <Card title="Python" icon="python" href="/sdks/python">
+    `pip install vectrade`
+  </Card>
+  <Card title="TypeScript" icon="js" href="/sdks/typescript">
+    `npm install @vectrade/sdk`
+  </Card>
+  <Card title="Go CLI" icon="terminal" href="/cli">
+    `brew install VecTrade-io/vectrade/vectrade`
+  </Card>
+</CardGroup>
+
+## Quick Example
+
+<CodeGroup>
+```python Python
+from vectrade import VecTrade
+
+client = VecTrade()  # uses VECTRADE_API_KEY env var
+quote = client.quotes.get("AAPL")
+print(f"{quote.symbol}: ${quote.price} ({quote.change_pct:+.2f}%)")
+```
+
+```typescript TypeScript
+import { VecTrade } from '@vectrade/sdk';
+
+const client = new VecTrade();
+const quote = await client.quotes.get('AAPL');
+console.log(`${quote.symbol}: $${quote.price} (${quote.changePct}%)`);
+```
+
+```bash CLI
+vectrade quote AAPL
+```
+</CodeGroup>
+
+## Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Real-time Quotes** | Sub-second market data for 100K+ instruments |
+| **Fundamentals** | Financial statements, ratios, and company profiles |
+| **Technicals** | 50+ indicators with configurable periods |
+| **AI Analysis** | GPT-powered financial analysis with citations |
+| **Screening** | Filter the entire market with custom rules |
+| **Webhooks** | Real-time event delivery with HMAC verification |
+| **Options** | Full options chains with Greeks |
+
+## Getting Started
+
+1. [Create an account](https://dashboard.vectrade.io/signup) and get your API key
+2. Install your preferred SDK
+3. Follow the [Quickstart Guide](/quickstart)

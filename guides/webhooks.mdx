@@ -1,0 +1,147 @@
+---
+title: Webhooks
+description: Receive real-time event notifications via webhooks with secure HMAC verification.
+---
+
+# Webhooks
+
+Webhooks deliver real-time events to your server when market conditions match your criteria.
+
+## Supported Events
+
+| Event | Description |
+|-------|-------------|
+| `quote.update` | Price change exceeds threshold |
+| `price.alert` | Price crosses configured level |
+| `news.published` | New article for watched symbols |
+| `screener.match` | Stock newly matches screener criteria |
+
+## Creating a Webhook
+
+<CodeGroup>
+```python Python
+from vectrade import VecTrade
+
+client = VecTrade()
+
+webhook = client.webhooks.create(
+    url="https://your-app.com/api/webhooks/vectrade",
+    events=["price.alert", "news.published"],
+    symbols=["AAPL", "GOOGL", "MSFT"],
+)
+
+# Save the signing secret securely
+print(f"Webhook ID: {webhook.id}")
+print(f"Secret: {webhook.secret}")  # Only shown once!
+```
+
+```typescript TypeScript
+const webhook = await client.webhooks.create({
+  url: 'https://your-app.com/api/webhooks/vectrade',
+  events: ['price.alert', 'news.published'],
+  symbols: ['AAPL', 'GOOGL', 'MSFT'],
+});
+
+console.log(`Secret: ${webhook.secret}`);
+```
+</CodeGroup>
+
+## Verifying Webhook Signatures
+
+Every webhook delivery includes a signature header for verification. **Always verify signatures** to ensure events are from VecTrade.
+
+Headers sent with each delivery:
+
+| Header | Description |
+|--------|-------------|
+| `X-VQ-Signature` | HMAC-SHA256 hex signature |
+| `X-VQ-Timestamp` | Unix timestamp of signing |
+| `X-VQ-Webhook-Id` | Delivery ID for deduplication |
+
+### Verification
+
+<CodeGroup>
+```python Python
+from vectrade import Webhooks
+
+# In your webhook handler
+def handle_webhook(request):
+    payload = request.body
+    signature = request.headers["X-VQ-Signature"]
+    timestamp = request.headers["X-VQ-Timestamp"]
+
+    is_valid = Webhooks.verify(
+        payload=payload,
+        signature=signature,
+        timestamp=timestamp,
+        secret="whsec_your_webhook_secret",
+    )
+
+    if not is_valid:
+        return Response(status=401)
+
+    event = json.loads(payload)
+    # Process event...
+```
+
+```typescript TypeScript
+import { verifyWebhook } from '@vectrade/sdk';
+
+export async function POST(req: Request) {
+  const payload = await req.text();
+  const signature = req.headers.get('X-VQ-Signature')!;
+  const timestamp = req.headers.get('X-VQ-Timestamp')!;
+
+  const isValid = await verifyWebhook({
+    payload,
+    signature,
+    timestamp,
+    secret: process.env.WEBHOOK_SECRET!,
+  });
+
+  if (!isValid) {
+    return new Response('Invalid signature', { status: 401 });
+  }
+
+  const event = JSON.parse(payload);
+  // Process event...
+}
+```
+</CodeGroup>
+
+## Webhook Payload Format
+
+```json
+{
+  "id": "evt_abc123",
+  "type": "price.alert",
+  "created_at": "2026-05-15T14:30:00Z",
+  "data": {
+    "symbol": "AAPL",
+    "price": 200.00,
+    "alert_type": "crosses_above",
+    "threshold": 199.50
+  }
+}
+```
+
+## Managing Webhooks
+
+```python
+# List all webhooks
+webhooks = client.webhooks.list()
+for wh in webhooks:
+    print(f"{wh.id}: {wh.url} ({', '.join(wh.events)})")
+
+# Delete a webhook
+client.webhooks.delete("wh_abc123")
+```
+
+## Best Practices
+
+1. **Always verify signatures** — Never trust unverified payloads
+2. **Respond quickly** — Return 2xx within 5 seconds; process asynchronously
+3. **Handle duplicates** — Use `X-VQ-Webhook-Id` for idempotency
+4. **Implement retry tolerance** — VecTrade retries failed deliveries 3 times
+5. **Use HTTPS** — Webhook URLs must use HTTPS
+6. **Rotate secrets** — Regenerate webhook secrets periodically

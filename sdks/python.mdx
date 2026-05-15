@@ -1,0 +1,122 @@
+---
+title: "Python SDK"
+description: "Install and use the official VecTrade Python SDK"
+---
+
+## Installation
+
+```bash
+pip install vectrade
+```
+
+Optional extras:
+
+```bash
+pip install vectrade[telemetry]   # OpenTelemetry integration
+pip install vectrade[pandas]      # DataFrame helpers
+```
+
+## Quick Start
+
+```python
+from vectrade import VecTrade
+
+client = VecTrade()  # reads VECTRADE_API_KEY env var
+
+quote = client.quotes.get("AAPL")
+print(f"{quote.symbol}: ${quote.price}")
+```
+
+### Async Client
+
+```python
+from vectrade import AsyncVecTrade
+
+async def main():
+    client = AsyncVecTrade()
+    quote = await client.quotes.get("AAPL")
+    print(f"{quote.symbol}: ${quote.price}")
+```
+
+## Configuration
+
+```python
+client = VecTrade(
+    api_key="vq_live_...",       # or VECTRADE_API_KEY env var
+    base_url="https://...",      # custom endpoint
+    timeout=30,                  # request timeout (seconds)
+    max_retries=2,               # automatic retries on 429/5xx
+    sandbox=True,                # use sandbox environment
+)
+```
+
+## Resources
+
+All 11 API resource groups are available:
+
+| Resource | Methods |
+|----------|---------|
+| `client.quotes` | `get(symbol)`, `batch(symbols)` |
+| `client.fundamentals` | `get(symbol)`, `income_statement(symbol)`, `balance_sheet(symbol)` |
+| `client.technicals` | `get(symbol, indicators, interval)` |
+| `client.news` | `list(symbols, limit)`, `get(id)` |
+| `client.screener` | `screen(filters, limit)` |
+| `client.ai` | `analyze(prompt)` — supports streaming |
+| `client.options` | `chain(symbol, expiration)`, `expirations(symbol)` |
+| `client.analyst` | `consensus(symbol)`, `price_targets(symbol)`, `ratings(symbol)` |
+| `client.earnings` | `history(symbol)`, `calendar()` |
+| `client.insider` | `transactions(symbol)`, `summary(symbol)` |
+| `client.webhooks` | `create(url, events)`, `list()`, `delete(id)` |
+
+## Streaming
+
+```python
+for chunk in client.ai.analyze("Analyze AAPL", stream=True):
+    print(chunk.content, end="")
+```
+
+## Pagination
+
+```python
+for article in client.news.list(limit=100):
+    print(article.title)
+# Automatically fetches next pages
+```
+
+## Middleware
+
+```python
+from vectrade.telemetry import OpenTelemetryMiddleware
+
+client = VecTrade(middleware=[OpenTelemetryMiddleware()])
+```
+
+## Webhooks
+
+```python
+from vectrade import Webhooks
+
+event = Webhooks.verify(payload, headers, secret)
+```
+
+## Error Handling
+
+```python
+from vectrade import RateLimitError, NotFoundError
+
+try:
+    quote = client.quotes.get("INVALID")
+except NotFoundError as e:
+    print(f"Not found: {e} (request_id: {e.request_id})")
+except RateLimitError as e:
+    print(f"Rate limited, retry after {e.retry_after}s")
+```
+
+## Requirements
+
+- Python 3.9+
+- Dependencies: `httpx`, `pydantic`
+
+<Card title="GitHub" icon="github" href="https://github.com/VecTrade-io/vectrade-python">
+  Source code, issues, and contributions
+</Card>

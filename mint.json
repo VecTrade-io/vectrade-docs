@@ -1,0 +1,49 @@
+{
+  "name": "VecTrade",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#6366f1",
+    "light": "#818cf8",
+    "dark": "#4f46e5"
+  },
+  "topbarLinks": [
+    { "name": "Dashboard", "url": "https://app.vectrade.io" }
+  ],
+  "topbarCtaButton": {
+    "name": "Get API Key",
+    "url": "https://app.vectrade.io/keys"
+  },
+  "tabs": [
+    { "name": "API Reference", "url": "api-reference" },
+    { "name": "SDKs", "url": "sdks" }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": ["introduction", "quickstart"]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "guides/authentication",
+        "guides/error-handling",
+        "guides/streaming",
+        "guides/rate-limits",
+        "guides/webhooks"
+      ]
+    },
+    {
+      "group": "SDKs",
+      "pages": ["sdks/python", "sdks/typescript", "sdks/cli"]
+    }
+  ],
+  "openapi": "../openapi/spec.yaml",
+  "footerSocials": {
+    "github": "https://github.com/VecTrade-io",
+    "x": "https://x.com/vectrade"
+  }
+}

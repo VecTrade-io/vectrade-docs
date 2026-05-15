@@ -1,0 +1,133 @@
+---
+title: Streaming
+description: Real-time streaming with Server-Sent Events (SSE) for AI analysis and live data.
+---
+
+# Streaming
+
+VecTrade uses Server-Sent Events (SSE) for real-time streaming of AI analysis responses.
+
+## AI Streaming
+
+<CodeGroup>
+```python Python
+from vectrade import VecTrade
+
+client = VecTrade()
+
+# Stream AI analysis
+for chunk in client.ai.stream("What's the bull case for NVDA?"):
+    print(chunk.text, end="", flush=True)
+
+print()  # newline after stream ends
+```
+
+```typescript TypeScript
+import { VecTrade } from '@vectrade/sdk';
+
+const client = new VecTrade();
+
+const stream = client.ai.stream('What\'s the bull case for NVDA?');
+for await (const chunk of stream) {
+  process.stdout.write(chunk.content);
+}
+```
+
+```bash cURL
+curl -N -H "Authorization: Bearer $VECTRADE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Bull case for NVDA?", "stream": true}' \
+  https://api.vectrade.io/v1/ai/analyze
+```
+</CodeGroup>
+
+## SSE Event Format
+
+The stream sends events in standard SSE format:
+
+```
+data: {"content": "NVIDIA's", "type": "text"}
+
+data: {"content": " bull case", "type": "text"}
+
+data: {"content": " rests on", "type": "text"}
+
+data: {"type": "citation", "source": "Q4 Earnings", "url": "..."}
+
+data: {"type": "done", "usage": {"prompt_tokens": 150, "completion_tokens": 420}}
+
+```
+
+## Stream Event Types
+
+| Type | Description |
+|------|-------------|
+| `text` | Content chunk to display |
+| `citation` | Source reference |
+| `metadata` | Model info, timing |
+| `done` | Stream complete with usage stats |
+
+## Async Streaming (Python)
+
+```python
+import asyncio
+from vectrade import AsyncVecTrade
+
+async def main():
+    client = AsyncVecTrade()
+
+    async for chunk in client.ai.stream("Analyze TSLA technicals"):
+        print(chunk.text, end="", flush=True)
+
+    await client.close()
+
+asyncio.run(main())
+```
+
+## Edge/Worker Streaming (TypeScript)
+
+For Vercel Edge Functions or Cloudflare Workers, convert to a ReadableStream:
+
+```typescript
+import { VecTrade, toReadableStream } from '@vectrade/sdk';
+
+export const runtime = 'edge';
+
+export async function POST(req: Request) {
+  const { prompt } = await req.json();
+  const client = new VecTrade();
+
+  const stream = client.ai.stream(prompt);
+  const readable = toReadableStream(stream);
+
+  return new Response(readable, {
+    headers: { 'Content-Type': 'text/event-stream' },
+  });
+}
+```
+
+## Error Handling in Streams
+
+Errors during streaming are delivered as error events before the connection closes:
+
+```python
+from vectrade import VecTrade, RateLimitError
+
+try:
+    for chunk in client.ai.stream("..."):
+        print(chunk.text, end="")
+except RateLimitError as e:
+    print(f"\nRate limited: retry after {e.retry_after}s")
+```
+
+## Connection Management
+
+- Streams auto-close when the `[DONE]` event is received
+- Use context managers for guaranteed cleanup:
+
+```python
+with VecTrade() as client:
+    for chunk in client.ai.stream("..."):
+        print(chunk.text, end="")
+# Connection is closed automatically
+```

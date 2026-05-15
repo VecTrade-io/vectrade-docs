@@ -1,0 +1,119 @@
+---
+title: Quickstart
+description: Get up and running with VecTrade in under 5 minutes.
+---
+
+# Quickstart
+
+## 1. Get Your API Key
+
+Sign up at [dashboard.vectrade.io](https://dashboard.vectrade.io/signup) and copy your API key from the Keys page.
+
+Set it as an environment variable:
+
+```bash
+export VECTRADE_API_KEY="vq_live_your_key_here"
+```
+
+## 2. Install the SDK
+
+<CodeGroup>
+```bash Python
+pip install vectrade
+```
+
+```bash TypeScript
+npm install @vectrade/sdk
+```
+
+```bash Go CLI
+brew install VecTrade-io/vectrade/vectrade
+# or
+go install github.com/VecTrade-io/vectrade-cli@latest
+```
+</CodeGroup>
+
+## 3. Make Your First Request
+
+<CodeGroup>
+```python Python
+from vectrade import VecTrade
+
+client = VecTrade()
+quote = client.quotes.get("AAPL")
+
+print(f"Symbol: {quote.symbol}")
+print(f"Price:  ${quote.price:.2f}")
+print(f"Change: {quote.change_pct:+.2f}%")
+print(f"Volume: {quote.volume:,}")
+```
+
+```typescript TypeScript
+import { VecTrade } from '@vectrade/sdk';
+
+const client = new VecTrade();
+const quote = await client.quotes.get('AAPL');
+
+console.log(`Symbol: ${quote.symbol}`);
+console.log(`Price:  $${quote.price.toFixed(2)}`);
+console.log(`Change: ${quote.changePct > 0 ? '+' : ''}${quote.changePct}%`);
+console.log(`Volume: ${quote.volume.toLocaleString()}`);
+```
+
+```bash cURL
+curl -H "Authorization: Bearer $VECTRADE_API_KEY" \
+  https://api.vectrade.io/v1/quotes/AAPL
+```
+</CodeGroup>
+
+## 4. Try AI Analysis
+
+<CodeGroup>
+```python Python
+# Streaming AI analysis
+for chunk in client.ai.stream("Analyze AAPL earnings trend"):
+    print(chunk.text, end="", flush=True)
+```
+
+```typescript TypeScript
+// Streaming AI analysis
+const stream = client.ai.stream('Analyze AAPL earnings trend');
+for await (const chunk of stream) {
+  process.stdout.write(chunk.content);
+}
+```
+
+```bash CLI
+vectrade ai "Analyze AAPL earnings trend"
+```
+</CodeGroup>
+
+## 5. Use the Sandbox
+
+For development and testing, use the sandbox environment with free unlimited requests:
+
+<CodeGroup>
+```python Python
+client = VecTrade(sandbox=True)
+```
+
+```typescript TypeScript
+const client = new VecTrade({ sandbox: true });
+```
+
+```bash Environment
+export VECTRADE_SANDBOX=true
+```
+</CodeGroup>
+
+<Note>
+Sandbox data is delayed and simulated. Use production keys for real-time data.
+</Note>
+
+## Next Steps
+
+- [Authentication Guide](/guides/authentication) — API key management and security
+- [Error Handling](/guides/error-handling) — Retry logic and error codes
+- [Rate Limits](/guides/rate-limits) — Quotas and optimization
+- [Streaming](/guides/streaming) — Real-time data with SSE
+- [Webhooks](/guides/webhooks) — Event-driven architecture

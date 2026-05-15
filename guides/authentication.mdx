@@ -1,0 +1,99 @@
+---
+title: Authentication
+description: How to authenticate with the VecTrade API and manage API keys securely.
+---
+
+# Authentication
+
+All VecTrade API requests require authentication via Bearer token.
+
+## API Key Types
+
+| Key Prefix | Environment | Use Case |
+|-----------|-------------|----------|
+| `vq_live_` | Production | Real-time data, production apps |
+| `vq_test_` | Sandbox | Development, testing, CI |
+
+## Setting Your API Key
+
+### Environment Variable (Recommended)
+
+```bash
+export VECTRADE_API_KEY="vq_live_your_key_here"
+```
+
+The SDK automatically reads `VECTRADE_API_KEY`:
+
+```python
+from vectrade import VecTrade
+client = VecTrade()  # reads from environment
+```
+
+### Explicit Configuration
+
+```python
+client = VecTrade(api_key="vq_live_your_key_here")
+```
+
+<Warning>
+Never hardcode API keys in source code. Use environment variables or secret managers.
+</Warning>
+
+## Key Security Best Practices
+
+1. **Rotate regularly** — Generate new keys and revoke old ones monthly
+2. **Use scoped keys** — Create keys with minimum required permissions
+3. **Separate environments** — Use different keys for dev/staging/production
+4. **Monitor usage** — Check the dashboard for unexpected activity
+5. **Use secrets managers** — Store keys in Vault, AWS Secrets Manager, etc.
+
+## Key Permissions (Scopes)
+
+| Scope | Access |
+|-------|--------|
+| `quotes:read` | Real-time and historical quotes |
+| `fundamentals:read` | Company financials and profiles |
+| `technicals:read` | Technical indicators and candles |
+| `news:read` | Financial news articles |
+| `screener:read` | Stock screener |
+| `ai:read` | AI analysis (streaming) |
+| `webhooks:write` | Create/delete webhooks |
+| `options:read` | Options chain data |
+
+## Error Responses
+
+Missing or invalid keys return `401 Unauthorized`:
+
+```json
+{
+  "error": {
+    "type": "authentication_error",
+    "message": "Missing or invalid API key",
+    "docs_url": "https://docs.vectrade.io/guides/authentication"
+  }
+}
+```
+
+Insufficient permissions return `403 Forbidden`:
+
+```json
+{
+  "error": {
+    "type": "permission_error",
+    "message": "API key does not have permission. Required scope: ai:read"
+  }
+}
+```
+
+## SDK Error Handling
+
+```python
+from vectrade import VecTrade, AuthenticationError
+
+try:
+    client = VecTrade(api_key="invalid_key")
+    client.quotes.get("AAPL")
+except AuthenticationError as e:
+    print(f"Auth failed: {e.message}")
+    print(f"Request ID: {e.request_id}")
+```
