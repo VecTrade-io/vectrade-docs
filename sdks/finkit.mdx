@@ -1,0 +1,180 @@
+---
+title: FinKit
+description: Open-source financial computation library — technical indicators, risk metrics, screening, and signals. No API key required.
+---
+
+# FinKit
+
+[![PyPI](https://img.shields.io/pypi/v/finkit)](https://pypi.org/project/finkit/)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/VecTrade-io/finkit)
+
+FinKit is VecTrade's open-source financial computation library. It provides technical indicators, risk metrics, stock screening, and signal detection — **no API key or VecTrade account required**.
+
+## Installation
+
+```bash
+pip install finkit
+```
+
+## Modules
+
+| Module | Description |
+|--------|-------------|
+| `finkit.indicators` | SMA, EMA, RSI, MACD, Bollinger Bands, ATR, VWAP, OBV |
+| `finkit.risk` | Sharpe Ratio, Sortino Ratio, Max Drawdown, VaR |
+| `finkit.screen` | Rule-based stock screening with 9 operators |
+| `finkit.signals` | Crossover/crossunder detection, SignalEngine |
+| `finkit.costs` | Trade cost calculation, annual cost drag |
+
+## Quick Start
+
+```python
+import pandas as pd
+import finkit
+
+# Technical indicators
+prices = pd.Series([...])  # your price data
+rsi = finkit.rsi(prices, period=14)
+sma = finkit.sma(prices, period=20)
+upper, middle, lower = finkit.bollinger_bands(prices)
+
+# Risk metrics
+returns = prices.pct_change().dropna()
+sharpe = finkit.sharpe_ratio(returns)
+sortino = finkit.sortino_ratio(returns)
+mdd = finkit.max_drawdown(returns)
+var_95 = finkit.var(returns, confidence=0.95, method="parametric")
+```
+
+## Technical Indicators
+
+```python
+from finkit import sma, ema, rsi, macd, bollinger_bands, atr, vwap, obv
+
+# Moving averages
+sma_20 = sma(prices, period=20)
+ema_12 = ema(prices, period=12)
+
+# Momentum
+rsi_14 = rsi(prices, period=14)
+macd_line, signal_line, histogram = macd(prices)
+
+# Volatility
+upper, middle, lower = bollinger_bands(prices, period=20, std_dev=2)
+atr_14 = atr(high, low, close, period=14)
+
+# Volume
+vwap_values = vwap(high, low, close, volume)
+obv_values = obv(close, volume)
+```
+
+## Risk Metrics
+
+```python
+from finkit import sharpe_ratio, sortino_ratio, max_drawdown, var
+
+returns = prices.pct_change().dropna()
+
+# Annualized Sharpe (assumes 252 trading days)
+sharpe = sharpe_ratio(returns, risk_free_rate=0.05)
+
+# Sortino (downside deviation only)
+sortino = sortino_ratio(returns)
+
+# Maximum drawdown
+mdd = max_drawdown(returns)  # returns negative float, e.g. -0.15
+
+# Value at Risk
+var_hist = var(returns, confidence=0.95, method="historical")
+var_param = var(returns, confidence=0.99, method="parametric")
+```
+
+## Stock Screening
+
+```python
+from finkit import Rule, screen
+
+universe = pd.DataFrame({
+    "symbol": ["AAPL", "GOOGL", "MSFT", "AMZN"],
+    "pe_ratio": [28, 22, 35, 45],
+    "market_cap": [3e12, 2e12, 3.1e12, 1.9e12],
+    "sector": ["Tech", "Tech", "Tech", "Consumer"],
+})
+
+results = screen(universe, rules=[
+    Rule("pe_ratio", "<", 30),
+    Rule("market_cap", ">", 2e12),
+    Rule("sector", "==", "Tech"),
+])
+# Returns: AAPL, GOOGL
+```
+
+### Supported Operators
+
+| Operator | Aliases | Description |
+|----------|---------|-------------|
+| `<` | `lt` | Less than |
+| `<=` | `lte` | Less than or equal |
+| `>` | `gt` | Greater than |
+| `>=` | `gte` | Greater than or equal |
+| `==` | `eq` | Equal |
+| `!=` | `ne` | Not equal |
+| `between` | — | Range (inclusive), value is `(low, high)` |
+| `in` | — | Membership, value is a list |
+| `contains` | — | String contains (case-insensitive) |
+
+## Signal Detection
+
+```python
+from finkit import crossover, crossunder, divergence, SignalEngine
+
+# Crossover detection
+buy_signals = crossover(fast=ema_12, slow=sma_20)
+sell_signals = crossunder(fast=ema_12, slow=sma_20)
+
+# Composable signal engine
+engine = SignalEngine()
+engine.add_rule("rsi_oversold", lambda df: df["rsi"] < 30, direction="long")
+engine.add_rule("macd_cross", lambda df: crossover(df["macd"], df["signal"]), direction="long")
+engine.add_rule("rsi_overbought", lambda df: df["rsi"] > 70, direction="short")
+
+signals = engine.evaluate(df)
+# Returns DataFrame with: signal_score, direction, triggered_rules
+```
+
+## Trade Costs
+
+```python
+from finkit import calculate_trade_cost, annual_cost_drag
+
+cost = calculate_trade_cost(shares=100, price=150.0, commission_per_share=0.005)
+# TradeCost(commission=0.50, total=0.50, cost_bps=0.33)
+
+drag = annual_cost_drag(trades_per_year=50, avg_cost_bps=0.33)
+# 16.5 bps annual drag
+```
+
+## Using with VecTrade SDK
+
+FinKit works great alongside the VecTrade SDK for local computations on fetched data:
+
+```python
+from vectrade import VecTrade
+import finkit
+
+client = VecTrade()
+
+# Fetch historical prices
+candles = client.candles.get("AAPL", interval="1d", limit=100)
+prices = pd.Series([c.close for c in candles])
+
+# Local computation (no API calls)
+rsi_values = finkit.rsi(prices)
+sharpe = finkit.sharpe_ratio(prices.pct_change().dropna())
+```
+
+## Links
+
+- [GitHub](https://github.com/VecTrade-io/finkit)
+- [PyPI](https://pypi.org/project/finkit/)
+- [Examples](https://github.com/VecTrade-io/vectrade-examples/blob/main/python/portfolio_analysis.py)
