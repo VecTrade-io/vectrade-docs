@@ -130,10 +130,7 @@
   ],
   "openapi": "openapi/spec.yaml",
   "api": {
-    "baseUrl": [
-      { "url": "https://api.vectrade.io/v1", "name": "Production" },
-      { "url": "https://api-uat.vectrade.io/v1", "name": "UAT" }
-    ],
+    "baseUrl": "https://api.vectrade.io/v1",
     "auth": {
       "method": "bearer",
       "name": "Authorization"
