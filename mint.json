@@ -15,15 +15,24 @@
     }
   },
   "topbarLinks": [
-    { "name": "vTrade", "url": "https://vectrade.io/vtrade" }
+    {
+      "name": "vTrade",
+      "url": "https://vectrade.io/vtrade"
+    }
   ],
   "topbarCtaButton": {
     "name": "Get API Key",
     "url": "https://vectrade.io/vtrade/developer"
   },
   "tabs": [
-    { "name": "API Reference", "url": "api-reference" },
-    { "name": "SDKs", "url": "sdks" }
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    },
+    {
+      "name": "SDKs",
+      "url": "sdks"
+    }
   ],
   "search": {
     "ai": false
@@ -33,12 +42,22 @@
       "name": "GitHub",
       "icon": "github",
       "url": "https://github.com/VecTrade-io"
+    },
+    {
+      "name": "Status",
+      "icon": "signal",
+      "url": "https://status.vectrade.io"
     }
   ],
   "navigation": [
     {
       "group": "Getting Started",
-      "pages": ["introduction", "quickstart", "ecosystem", "changelog"]
+      "pages": [
+        "introduction",
+        "quickstart",
+        "ecosystem",
+        "changelog"
+      ]
     },
     {
       "group": "Guides",
@@ -74,7 +93,9 @@
     },
     {
       "group": "API Reference",
-      "pages": ["api-reference/overview"]
+      "pages": [
+        "api-reference/overview"
+      ]
     },
     {
       "group": "Market Data",
@@ -142,24 +163,48 @@
       {
         "title": "Product",
         "links": [
-          { "label": "vTrade", "url": "https://vectrade.io/vtrade" },
-          { "label": "API Reference", "url": "https://docs.vectrade.io/api-reference/overview" },
-          { "label": "Pricing", "url": "https://vectrade.io/pricing" }
+          {
+            "label": "vTrade",
+            "url": "https://vectrade.io/vtrade"
+          },
+          {
+            "label": "API Reference",
+            "url": "https://docs.vectrade.io/api-reference/overview"
+          },
+          {
+            "label": "Pricing",
+            "url": "https://vectrade.io/pricing"
+          }
         ]
       },
       {
         "title": "SDKs",
         "links": [
-          { "label": "Python", "url": "https://docs.vectrade.io/sdks/python" },
-          { "label": "TypeScript", "url": "https://docs.vectrade.io/sdks/typescript" },
-          { "label": "CLI", "url": "https://docs.vectrade.io/sdks/cli" }
+          {
+            "label": "Python",
+            "url": "https://docs.vectrade.io/sdks/python"
+          },
+          {
+            "label": "TypeScript",
+            "url": "https://docs.vectrade.io/sdks/typescript"
+          },
+          {
+            "label": "CLI",
+            "url": "https://docs.vectrade.io/sdks/cli"
+          }
         ]
       },
       {
         "title": "Company",
         "links": [
-          { "label": "GitHub", "url": "https://github.com/VecTrade-io" },
-          { "label": "Status", "url": "https://status.vectrade.io" }
+          {
+            "label": "GitHub",
+            "url": "https://github.com/VecTrade-io"
+          },
+          {
+            "label": "Status",
+            "url": "https://status.vectrade.io"
+          }
         ]
       }
     ],
