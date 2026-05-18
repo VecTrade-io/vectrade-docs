@@ -1,0 +1,85 @@
+---
+title: OpenAPI Specification
+description: Use the VecTrade OpenAPI 3.1 spec to generate clients, validate requests, and explore the API programmatically.
+---
+
+# OpenAPI Specification
+
+VecTrade publishes a machine-readable API contract following [OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.0) and [AsyncAPI](https://www.asyncapi.com/) standards.
+
+## Spec URLs
+
+| Format | URL |
+|--------|-----|
+| OpenAPI 3.1 (YAML) | `https://api.vectrade.io/v1/openapi.yaml` |
+| OpenAPI 3.1 (JSON) | `https://api.vectrade.io/v1/openapi.json` |
+| AsyncAPI (Webhooks) | `https://api.vectrade.io/v1/asyncapi.yaml` |
+
+## Repository
+
+<Card title="vectrade-openapi" icon="github" href="https://github.com/VecTrade-io/vectrade-openapi">
+  Source of truth for the VecTrade API contract. Includes validation, changelog, and CI linting.
+</Card>
+
+## Generate a Client
+
+Use any OpenAPI code generator to create a typed client in your language:
+
+<CodeGroup>
+```bash Python (openapi-python-client)
+pip install openapi-python-client
+openapi-python-client generate --url https://api.vectrade.io/v1/openapi.yaml
+```
+
+```bash TypeScript (openapi-typescript)
+npx openapi-typescript https://api.vectrade.io/v1/openapi.yaml -o ./types/vectrade.d.ts
+```
+
+```bash Go (oapi-codegen)
+oapi-codegen -generate types,client -package vectrade \
+  https://api.vectrade.io/v1/openapi.yaml > vectrade.gen.go
+```
+
+```bash Rust (openapi-generator)
+openapi-generator generate -i https://api.vectrade.io/v1/openapi.yaml \
+  -g rust -o ./vectrade-rs
+```
+</CodeGroup>
+
+## What's Included
+
+The spec covers all public endpoints across **11 resource groups**:
+
+- **Quotes** — Real-time and batch market data
+- **Fundamentals** — Financial statements, ratios
+- **Technicals** — 50+ technical indicators
+- **News** — Financial news with sentiment
+- **Screener** — Custom market filters
+- **AI** — Streaming analysis with citations
+- **Options** — Chains, Greeks, expirations
+- **Analyst** — Consensus, price targets, ratings
+- **Earnings** — History and calendar
+- **Insider** — Transactions and summaries
+- **Developer** — API key management, usage, quotas
+
+## Versioning
+
+The spec is versioned alongside the API. Breaking changes are announced with a deprecation period:
+
+| Version | Status | Notes |
+|---------|--------|-------|
+| `v1` | **Current** | Stable, production-ready |
+| `v2` | Planned | — |
+
+## Validation & Linting
+
+The repository includes CI checks:
+
+- **Spectral** — Linting rules for naming conventions, response schemas
+- **OpenAPI Diff** — Breaking change detection on PRs
+- **Type Coverage** — Ensures all endpoints have typed request/response schemas
+
+```bash
+# Run locally
+npx @stoplight/spectral-cli lint openapi/spec.yaml
+```

@@ -1,0 +1,92 @@
+---
+title: Ecosystem
+description: The complete VecTrade open-source ecosystem — SDKs, tools, integrations, and community resources.
+---
+
+# Ecosystem
+
+VecTrade is a modular financial data platform. Every component is open-source under the [VecTrade-io](https://github.com/VecTrade-io) GitHub organization.
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Your Application                          │
+├────────┬────────┬────────┬──────────┬──────────┬───────────────┤
+│ Python │  Node  │  CLI   │ AI Prov. │   MCP    │    FinKit     │
+│  SDK   │  SDK   │        │ (Vercel) │  Server  │  (Analytics)  │
+├────────┴────────┴────────┴──────────┴──────────┴───────────────┤
+│                     VecTrade REST API (v1)                       │
+│              api.vectrade.io  ·  api-uat.vectrade.io            │
+├─────────────────────────────────────────────────────────────────┤
+│  Quotes · Fundamentals · Technicals · News · AI · Options · …  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## SDKs & Libraries
+
+<CardGroup cols={2}>
+  <Card title="Python SDK" icon="python" href="/sdks/python">
+    `pip install vectrade` — Async-first, fully typed, streaming support.
+  </Card>
+  <Card title="TypeScript SDK" icon="js" href="/sdks/typescript">
+    `npm install @vectrade/sdk` — Zero dependencies, edge-ready, pagination iterators.
+  </Card>
+  <Card title="CLI" icon="terminal" href="/sdks/cli">
+    `brew install VecTrade-io/vectrade/vectrade` — Cross-platform Go binary with shell completions.
+  </Card>
+  <Card title="AI Provider" icon="brain" href="/sdks/ai-provider">
+    `npm install @vectrade/ai-provider` — Vercel AI SDK integration for tool-use agents.
+  </Card>
+  <Card title="MCP Server" icon="plug" href="/sdks/mcp">
+    Model Context Protocol server for Claude, Cursor, Windsurf, and other AI IDEs.
+  </Card>
+  <Card title="FinKit" icon="chart-mixed" href="/sdks/finkit">
+    Open-source financial analytics toolkit: indicators, backtesting, risk metrics.
+  </Card>
+</CardGroup>
+
+## Developer Tools
+
+<CardGroup cols={2}>
+  <Card title="OpenAPI Spec" icon="file-code" href="/resources/openapi">
+    Machine-readable API contract (OpenAPI 3.1 + AsyncAPI). Generate clients in any language.
+  </Card>
+  <Card title="Examples" icon="code" href="/resources/examples">
+    Copy-paste quickstart examples in Python, TypeScript, Go, and cURL.
+  </Card>
+</CardGroup>
+
+## Distribution
+
+| Channel | Repository | Install |
+|---------|-----------|---------|
+| PyPI | [vectrade-python](https://github.com/VecTrade-io/vectrade-python) | `pip install vectrade` |
+| npm | [vectrade-node](https://github.com/VecTrade-io/vectrade-node) | `npm install @vectrade/sdk` |
+| Homebrew | [homebrew-vectrade](https://github.com/VecTrade-io/homebrew-vectrade) | `brew install VecTrade-io/vectrade/vectrade` |
+| Scoop (Windows) | [scoop-vectrade](https://github.com/VecTrade-io/scoop-vectrade) | `scoop install vectrade` |
+| Go | [vectrade-cli](https://github.com/VecTrade-io/vectrade-cli) | `go install github.com/VecTrade-io/vectrade-cli@latest` |
+| Docker | — | `docker pull ghcr.io/vectrade-io/vectrade-mcp` |
+
+## Community
+
+<CardGroup cols={2}>
+  <Card title="awesome-vectrade" icon="star" href="https://github.com/VecTrade-io/awesome-vectrade">
+    Curated list of community projects, integrations, tutorials, and resources built with VecTrade.
+  </Card>
+  <Card title="GitHub Discussions" icon="comments" href="https://github.com/orgs/VecTrade-io/discussions">
+    Ask questions, share ideas, and connect with the community.
+  </Card>
+</CardGroup>
+
+## Environments
+
+| Environment | API Base | Docs | Dashboard |
+|-------------|----------|------|-----------|
+| **Production** | `api.vectrade.io` | [docs.vectrade.io](https://docs.vectrade.io) | [app.vectrade.io](https://app.vectrade.io) |
+| **UAT** | `api-uat.vectrade.io` | [docs.uat.vectrade.io](https://docs.uat.vectrade.io) | [uat.vectrade.io](https://uat.vectrade.io) |
+| **Sandbox** | Same endpoints, `sandbox=true` | — | — |
+
+<Note>
+Sandbox uses test keys (`vq_test_*`) and returns simulated/delayed data. Free for development with no rate limits.
+</Note>

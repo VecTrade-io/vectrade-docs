@@ -1,0 +1,114 @@
+---
+title: "AI Provider"
+description: "Use VecTrade as a tool provider with the Vercel AI SDK"
+---
+
+## Overview
+
+The `@vectrade/ai-provider` package integrates VecTrade financial data as tools in the [Vercel AI SDK](https://sdk.vercel.ai/). This lets any LLM access real-time market data, fundamentals, and AI analysis through function calling.
+
+## Installation
+
+```bash
+npm install @vectrade/ai-provider ai
+```
+
+## Quick Start
+
+```typescript
+import { createVecTrade } from "@vectrade/ai-provider";
+import { generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+const vt = createVecTrade(); // reads VECTRADE_API_KEY env var
+
+const result = await generateText({
+  model: openai("gpt-4o"),
+  tools: vt.tools(),
+  prompt: "What's AAPL trading at and what do analysts think?",
+});
+
+console.log(result.text);
+```
+
+## Available Tools
+
+The provider exposes all VecTrade API endpoints as AI-callable tools:
+
+| Tool | Description |
+|------|-------------|
+| `getQuote` | Get real-time quote for a symbol |
+| `getBatchQuotes` | Get quotes for multiple symbols |
+| `getFundamentals` | Company fundamentals and ratios |
+| `getTechnicals` | Technical indicators |
+| `analyzeAI` | VecTrade AI financial analysis |
+| `getOptionsChain` | Options chain with Greeks |
+| `getAnalystConsensus` | Analyst consensus ratings |
+| `getEarningsHistory` | Historical earnings data |
+| `listNews` | Latest market news |
+| `runScreener` | Stock screening with filters |
+
+## Configuration
+
+```typescript
+const vt = createVecTrade({
+  apiKey: "vq_live_...",        // or VECTRADE_API_KEY env var
+  baseURL: "https://api.vectrade.io/v1",
+});
+
+// Use specific tools only
+const tools = vt.tools(["getQuote", "getAnalystConsensus"]);
+```
+
+## Framework Examples
+
+### Next.js Route Handler
+
+```typescript
+import { createVecTrade } from "@vectrade/ai-provider";
+import { streamText } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+  const vt = createVecTrade();
+
+  const result = streamText({
+    model: openai("gpt-4o"),
+    tools: vt.tools(),
+    messages,
+  });
+
+  return result.toDataStreamResponse();
+}
+```
+
+### With Claude
+
+```typescript
+import { createVecTrade } from "@vectrade/ai-provider";
+import { generateText } from "ai";
+import { anthropic } from "@ai-sdk/anthropic";
+
+const vt = createVecTrade();
+
+const result = await generateText({
+  model: anthropic("claude-sonnet-4-20250514"),
+  tools: vt.tools(),
+  maxSteps: 5,
+  prompt: "Compare NVDA and AMD earnings growth over the last 4 quarters",
+});
+```
+
+## Requirements
+
+- Node.js 18+
+- `ai` package (Vercel AI SDK) v3+
+- VecTrade API key
+
+## Resources
+
+- [GitHub](https://github.com/VecTrade-io/vectrade-ai-provider)
+- [npm](https://www.npmjs.com/package/@vectrade/ai-provider)
+- [Vercel AI SDK Docs](https://sdk.vercel.ai/)
+- [Examples](https://github.com/VecTrade-io/vectrade-examples/tree/main/typescript/ai-provider)
