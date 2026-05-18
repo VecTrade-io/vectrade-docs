@@ -47,9 +47,11 @@
       "pages": [
         "guides/authentication",
         "guides/error-handling",
+        "guides/pagination",
         "guides/streaming",
         "guides/rate-limits",
-        "guides/webhooks"
+        "guides/webhooks",
+        "guides/best-practices"
       ]
     },
     {
