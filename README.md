@@ -3,7 +3,7 @@
 [![CI](https://github.com/VecTrade-io/vectrade-docs/actions/workflows/ci.yml/badge.svg)](https://github.com/VecTrade-io/vectrade-docs/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/VecTrade-io/vectrade-docs)](LICENSE)
 
-Documentation source for [docs.vectrade.io](https://vectrade.io/api-docs), built with [Mintlify](https://mintlify.com).
+Documentation source for [docs.vectrade.io](https://docs.vectrade.io), built with [Mintlify](https://mintlify.com).
 
 ## Local Development
 
@@ -82,13 +82,13 @@ done
 
 | Repository | Description | Docs Page |
 |-----------|-------------|-----------|
-| [vectrade-python](https://github.com/VecTrade-io/vectrade-python) | Python SDK | [/sdks/python](https://vectrade.io/api-docs/sdks/python) |
-| [vectrade-node](https://github.com/VecTrade-io/vectrade-node) | TypeScript SDK | [/sdks/typescript](https://vectrade.io/api-docs/sdks/typescript) |
-| [vectrade-cli](https://github.com/VecTrade-io/vectrade-cli) | Go CLI | [/sdks/cli](https://vectrade.io/api-docs/sdks/cli) |
-| [vectrade-ai-provider](https://github.com/VecTrade-io/vectrade-ai-provider) | Vercel AI SDK provider | [/sdks/ai-provider](https://vectrade.io/api-docs/sdks/ai-provider) |
-| [vectrade-mcp](https://github.com/VecTrade-io/vectrade-mcp) | MCP server for AI IDEs | [/sdks/mcp](https://vectrade.io/api-docs/sdks/mcp) |
-| [finkit](https://github.com/VecTrade-io/finkit) | Financial computations | [/sdks/finkit](https://vectrade.io/api-docs/sdks/finkit) |
-| [vectrade-openapi](https://github.com/VecTrade-io/vectrade-openapi) | OpenAPI spec | [/api-reference](https://vectrade.io/api-docs/api-reference/overview) |
+| [vectrade-python](https://github.com/VecTrade-io/vectrade-python) | Python SDK | [/sdks/python](https://docs.vectrade.io/sdks/python) |
+| [vectrade-node](https://github.com/VecTrade-io/vectrade-node) | TypeScript SDK | [/sdks/typescript](https://docs.vectrade.io/sdks/typescript) |
+| [vectrade-cli](https://github.com/VecTrade-io/vectrade-cli) | Go CLI | [/sdks/cli](https://docs.vectrade.io/sdks/cli) |
+| [vectrade-ai-provider](https://github.com/VecTrade-io/vectrade-ai-provider) | Vercel AI SDK provider | [/sdks/ai-provider](https://docs.vectrade.io/sdks/ai-provider) |
+| [vectrade-mcp](https://github.com/VecTrade-io/vectrade-mcp) | MCP server for AI IDEs | [/sdks/mcp](https://docs.vectrade.io/sdks/mcp) |
+| [finkit](https://github.com/VecTrade-io/finkit) | Financial computations | [/sdks/finkit](https://docs.vectrade.io/sdks/finkit) |
+| [vectrade-openapi](https://github.com/VecTrade-io/vectrade-openapi) | OpenAPI spec | [/api-reference](https://docs.vectrade.io/api-reference/overview) |
 | [vectrade-examples](https://github.com/VecTrade-io/vectrade-examples) | Runnable examples | — |
 | [vectrade-sdk-generator](https://github.com/VecTrade-io/vectrade-sdk-generator) | SDK code generator | — |
 | [homebrew-vectrade](https://github.com/VecTrade-io/homebrew-vectrade) | Homebrew tap | — |
