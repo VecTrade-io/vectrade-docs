@@ -25,16 +25,14 @@
     { "name": "API Reference", "url": "api-reference" },
     { "name": "SDKs", "url": "sdks" }
   ],
+  "search": {
+    "ai": false
+  },
   "anchors": [
     {
       "name": "GitHub",
       "icon": "github",
       "url": "https://github.com/VecTrade-io"
-    },
-    {
-      "name": "Status",
-      "icon": "signal",
-      "url": "https://status.vectrade.io"
     }
   ],
   "navigation": [
