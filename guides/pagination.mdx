@@ -1,0 +1,132 @@
+---
+title: Pagination
+description: Navigate large result sets with cursor-based pagination across all VecTrade list endpoints.
+---
+
+# Pagination
+
+List endpoints return paginated results using **cursor-based pagination**. This approach is stable under concurrent writes and scales to millions of records.
+
+## Response Envelope
+
+All list endpoints return a standard envelope:
+
+```json
+{
+  "data": [ ... ],
+  "has_more": true,
+  "cursor": "eyJpZCI6MTAwfQ==",
+  "total": 1542
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `data` | array | Page of results |
+| `has_more` | boolean | Whether more pages exist |
+| `cursor` | string | Opaque cursor for the next page (null if last page) |
+| `total` | number | Total result count (may be approximate for large sets) |
+
+## Using Cursors
+
+Pass the `cursor` from the previous response to fetch the next page:
+
+<CodeGroup>
+```python Python
+from vectrade import VecTrade
+
+client = VecTrade()
+
+# Automatic iteration (recommended)
+for article in client.news.list(limit=50):
+    print(article.title)
+# SDK handles pagination automatically — fetches pages as you iterate
+
+# Manual pagination
+page = client.news.list(limit=50)
+while True:
+    for article in page.data:
+        print(article.title)
+    if not page.has_more:
+        break
+    page = client.news.list(limit=50, cursor=page.cursor)
+```
+
+```typescript TypeScript
+import { VecTrade } from '@vectrade/sdk';
+
+const client = new VecTrade();
+
+// Async iterator (recommended)
+for await (const article of client.news.list({ limit: 50 })) {
+  console.log(article.title);
+}
+// SDK handles pagination automatically
+
+// Manual pagination
+let cursor: string | undefined;
+do {
+  const page = await client.news.list({ limit: 50, cursor });
+  for (const article of page.data) {
+    console.log(article.title);
+  }
+  cursor = page.hasMore ? page.cursor : undefined;
+} while (cursor);
+```
+
+```bash cURL
+# First page
+curl -H "Authorization: Bearer $VECTRADE_API_KEY" \
+  "https://api.vectrade.io/v1/vq/news?limit=50"
+
+# Next page (using cursor from response)
+curl -H "Authorization: Bearer $VECTRADE_API_KEY" \
+  "https://api.vectrade.io/v1/vq/news?limit=50&cursor=eyJpZCI6MTAwfQ=="
+```
+</CodeGroup>
+
+## Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `limit` | integer | 20 | Items per page (1–100) |
+| `cursor` | string | — | Cursor from previous response |
+
+## Collect All Results
+
+<CodeGroup>
+```python Python
+# Collect all results into a list
+all_articles = list(client.news.list(limit=100))
+
+# Or with async
+all_articles = await client.news.list(limit=100).collect()
+```
+
+```typescript TypeScript
+// Collect all results into an array
+const allArticles = await client.news.list({ limit: 100 }).toArray();
+```
+</CodeGroup>
+
+## Paginated Endpoints
+
+| Endpoint | Resource | Default Limit |
+|----------|----------|---------------|
+| `GET /vq/news` | News articles | 20 |
+| `GET /vq/earnings/calendar` | Earnings dates | 20 |
+| `GET /vq/insider/{symbol}/transactions` | Insider trades | 20 |
+| `GET /vq/analyst/{symbol}/ratings` | Analyst ratings | 20 |
+| `GET /vq/webhooks` | Webhook subscriptions | 20 |
+| `GET /vq/developer/keys` | API keys | 20 |
+
+## Best Practices
+
+1. **Use SDK iterators** — Both SDKs handle pagination automatically via `for` loops
+2. **Set appropriate limits** — Use `limit=100` for bulk processing, smaller values for UI
+3. **Don't store cursors long-term** — Cursors may expire after 24 hours
+4. **Use filters to reduce pages** — Apply server-side filtering instead of client-side
+
+<Warning>
+Cursors are **opaque** — do not parse, modify, or construct them manually. They may change format without notice.
+</Warning>

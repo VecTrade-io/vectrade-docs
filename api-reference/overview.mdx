@@ -1,0 +1,110 @@
+---
+title: "API Reference"
+description: "Complete reference for the VecTrade REST API — 27 endpoints across market data, AI analysis, options, and developer management."
+---
+
+# API Reference
+
+The VecTrade API is organized around REST. All requests use `https://api.vectrade.io/v1` as the base URL and return JSON responses.
+
+## Base URL
+
+```
+https://api.vectrade.io/v1
+```
+
+## Authentication
+
+All endpoints require a Bearer token. Include your API key in the `Authorization` header:
+
+```bash
+Authorization: Bearer vq_live_your_key_here
+```
+
+Get your key at [app.vectrade.io/keys](https://app.vectrade.io/keys). See the [Authentication Guide](/guides/authentication) for key management best practices.
+
+## Endpoint Groups
+
+<CardGroup cols={2}>
+  <Card title="Market Data" icon="chart-candlestick" href="/api-reference/quotes/get-quote">
+    Real-time quotes, fundamentals, technicals, news, and screening.
+  </Card>
+  <Card title="AI & Analysis" icon="brain" href="/api-reference/ai/analyze">
+    GPT-powered analysis, analyst ratings, earnings, and insider activity.
+  </Card>
+  <Card title="Options & Events" icon="bell" href="/api-reference/options/chain">
+    Full options chains with Greeks, plus webhook event delivery.
+  </Card>
+  <Card title="Developer" icon="key" href="/api-reference/developer/list-keys">
+    API key management, usage tracking, quotas, and billing.
+  </Card>
+</CardGroup>
+
+## Quick Summary
+
+| Group | Endpoints | Description |
+|-------|-----------|-------------|
+| **Quotes** | `GET /vq/quotes/{symbol}`, `POST /vq/quotes/batch` | Real-time and batch price data |
+| **Fundamentals** | `GET /vq/fundamentals/{symbol}`, `/income`, `/balance-sheet` | Financial statements and ratios |
+| **Technicals** | `GET /vq/technicals/{symbol}` | 50+ indicators with configurable periods |
+| **News** | `GET /vq/news`, `GET /vq/news/{id}` | Market news with sentiment scoring |
+| **Screener** | `POST /vq/screener` | Filter 100K+ instruments with custom rules |
+| **AI** | `POST /vq/ai/analyze` | Streaming AI analysis with citations |
+| **Analyst** | `GET /vq/analyst/{symbol}/consensus`, `/price-targets`, `/ratings` | Wall Street consensus data |
+| **Earnings** | `GET /vq/earnings/{symbol}/history`, `/calendar` | Earnings history and upcoming dates |
+| **Insider** | `GET /vq/insider/{symbol}/transactions`, `/summary` | Insider trading activity |
+| **Options** | `GET /vq/options/{symbol}`, `/expirations` | Options chains with Greeks |
+| **Webhooks** | `GET /vq/webhooks`, `POST /vq/webhooks`, `DELETE /vq/webhooks/{id}` | Event subscriptions |
+| **Developer** | Keys, usage, plan, quota | Account and API key management |
+
+## SDKs
+
+Don't want to work with raw HTTP? Use our official SDKs:
+
+<CardGroup cols={3}>
+  <Card title="Python" icon="python" href="/sdks/python">
+    `pip install vectrade`
+  </Card>
+  <Card title="TypeScript" icon="js" href="/sdks/typescript">
+    `npm install @vectrade/sdk`
+  </Card>
+  <Card title="Go CLI" icon="terminal" href="/sdks/cli">
+    `brew install VecTrade-io/vectrade/vectrade`
+  </Card>
+  <Card title="FinKit" icon="calculator" href="/sdks/finkit">
+    `pip install vectrade-finkit`
+  </Card>
+  <Card title="MCP Server" icon="plug" href="/sdks/mcp">
+    AI IDE integration
+  </Card>
+  <Card title="AI Provider" icon="wand-magic-sparkles" href="/sdks/ai-provider">
+    Vercel AI SDK
+  </Card>
+</CardGroup>
+
+## Rate Limits
+
+| Plan | Requests/min | Requests/day |
+|------|-------------|--------------|
+| Free | 30 | 1,000 |
+| Pro | 300 | 50,000 |
+| Enterprise | Custom | Custom |
+
+See [Rate Limits Guide](/guides/rate-limits) for optimization strategies.
+
+## Errors
+
+All errors return a consistent JSON structure:
+
+```json
+{
+  "error": {
+    "type": "rate_limit_error",
+    "message": "Rate limit exceeded",
+    "request_id": "req_abc123",
+    "retry_after": 2
+  }
+}
+```
+
+See [Error Handling Guide](/guides/error-handling) for the full error taxonomy and retry strategies.

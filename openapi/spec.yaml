@@ -1,0 +1,1697 @@
+openapi: "3.1.0"
+info:
+  title: VecTrade API
+  version: 1.0.0
+  description: |
+    Financial data, AI-powered analysis, and trading intelligence.
+
+    ## Authentication
+    All requests require a Bearer token in the Authorization header:
+    ```
+    Authorization: Bearer vq_live_...
+    ```
+
+    ## Rate Limits
+    Response headers include rate limit info:
+    - `X-VQ-RateLimit-Limit` — requests per window
+    - `X-VQ-RateLimit-Remaining` — remaining requests
+    - `X-VQ-RateLimit-Reset` — window reset timestamp (Unix)
+  contact:
+    name: VecTrade API Support
+    email: api@vectrade.io
+    url: https://docs.vectrade.io
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: https://api.vectrade.io/v1
+    description: Production & Sandbox (mode determined by API key prefix)
+
+security:
+  - BearerAuth: []
+
+paths:
+  /vq/quotes/{symbol}:
+    get:
+      operationId: getQuote
+      summary: Get real-time quote
+      description: Retrieve the latest real-time quote for a single symbol including price, change, volume, and market data.
+      tags: [Quotes]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+          example: AAPL
+        - name: fields
+          in: query
+          schema:
+            type: string
+          description: Comma-separated list of fields to return
+      responses:
+        "200":
+          description: Quote data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/quotes/batch:
+    get:
+      operationId: getBatchQuotes
+      summary: Get quotes for multiple symbols
+      description: Retrieve real-time quotes for up to 50 symbols in a single request.
+      tags: [Quotes]
+      parameters:
+        - name: symbols
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Comma-separated symbols (max 50)
+          example: AAPL,GOOGL,MSFT
+      responses:
+        "200":
+          description: Batch quote data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Quote"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/fundamentals/{symbol}:
+    get:
+      operationId: getFundamentals
+      summary: Get company fundamentals
+      description: Retrieve fundamental data for a company including valuation ratios, market cap, dividends, and sector information.
+      tags: [Fundamentals]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+          example: AAPL
+      responses:
+        "200":
+          description: Fundamental data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fundamental"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/fundamentals/{symbol}/income:
+    get:
+      operationId: getIncomeStatement
+      summary: Get income statement
+      description: Retrieve historical income statement data for a company, including revenue, costs, and earnings.
+      tags: [Fundamentals]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [annual, quarterly]
+            default: annual
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 4
+      responses:
+        "200":
+          description: Income statement data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/IncomeStatement"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/fundamentals/{symbol}/balance-sheet:
+    get:
+      operationId: getBalanceSheet
+      summary: Get balance sheet
+      description: Retrieve historical balance sheet data for a company, including assets, liabilities, and equity.
+      tags: [Fundamentals]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [annual, quarterly]
+            default: annual
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 4
+      responses:
+        "200":
+          description: Balance sheet data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BalanceSheet"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/technicals/{symbol}:
+    get:
+      operationId: getTechnicals
+      summary: Get technical indicators
+      description: Retrieve technical analysis indicators (SMA, EMA, RSI, MACD, Bollinger Bands) and OHLCV candle data for a symbol.
+      tags: [Technicals]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+          example: AAPL
+        - name: indicators
+          in: query
+          schema:
+            type: string
+          description: Comma-separated indicator names (sma, ema, rsi, macd, bollinger)
+          example: sma,rsi,macd
+        - name: interval
+          in: query
+          schema:
+            type: string
+            enum: [1m, 5m, 15m, 1h, 4h, 1d, 1w, 1M]
+            default: 1d
+        - name: period
+          in: query
+          schema:
+            type: integer
+            default: 14
+      responses:
+        "200":
+          description: Technical indicator data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Technical"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/news:
+    get:
+      operationId: listNews
+      summary: List financial news
+      description: Retrieve a paginated list of financial news articles, optionally filtered by symbols.
+      tags: [News]
+      parameters:
+        - name: symbols
+          in: query
+          schema:
+            type: string
+          description: Filter by symbols (comma-separated)
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: cursor
+          in: query
+          schema:
+            type: string
+          description: Pagination cursor
+      responses:
+        "200":
+          description: News articles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/NewsArticle"
+                  page_info:
+                    $ref: "#/components/schemas/PageInfo"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/news/{id}:
+    get:
+      operationId: getNewsArticle
+      summary: Get a single news article
+      description: Retrieve a single news article by its unique identifier.
+      tags: [News]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: News article detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsArticle"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/screener:
+    get:
+      operationId: runScreener
+      summary: Run stock screener
+      description: Run a stock screener query with custom filters for market cap, P/E ratio, sector, and more. Results are paginated.
+      tags: [Screener]
+      parameters:
+        - name: market_cap_min
+          in: query
+          schema:
+            type: number
+          description: Minimum market capitalization
+        - name: market_cap_max
+          in: query
+          schema:
+            type: number
+          description: Maximum market capitalization
+        - name: pe_min
+          in: query
+          schema:
+            type: number
+          description: Minimum P/E ratio
+        - name: pe_max
+          in: query
+          schema:
+            type: number
+          description: Maximum P/E ratio
+        - name: dividend_yield_min
+          in: query
+          schema:
+            type: number
+          description: Minimum dividend yield
+        - name: sector
+          in: query
+          schema:
+            type: string
+          description: Filter by sector
+        - name: industry
+          in: query
+          schema:
+            type: string
+          description: Filter by industry
+        - name: country
+          in: query
+          schema:
+            type: string
+            default: US
+          description: Country code filter
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            default: market_cap
+            enum: [market_cap, pe_ratio, dividend_yield, volume, change_pct]
+          description: Sort field
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            default: desc
+            enum: [asc, desc]
+          description: Sort direction
+        - name: volume_min
+          in: query
+          schema:
+            type: integer
+          description: Minimum trading volume
+        - name: exchange
+          in: query
+          schema:
+            type: string
+            enum: [NYSE, NASDAQ, AMEX]
+          description: Exchange filter
+        - name: cursor
+          in: query
+          schema:
+            type: string
+          description: Pagination cursor
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+          description: Results per page
+      responses:
+        "200":
+          description: Screener results (paginated)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ScreenerResult"
+                  page_info:
+                    $ref: "#/components/schemas/PageInfo"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/ai/analyze:
+    post:
+      operationId: analyzeAI
+      summary: AI-powered financial analysis
+      description: Submit a natural-language prompt for AI-powered financial analysis. Supports streaming via Server-Sent Events.
+      tags: [AI]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prompt]
+              properties:
+                prompt:
+                  type: string
+                  description: Analysis prompt
+                  example: "Analyze AAPL for long-term hold"
+                symbols:
+                  type: array
+                  items:
+                    type: string
+                  description: Symbols to include in context
+                stream:
+                  type: boolean
+                  default: false
+      responses:
+        "200":
+          description: Analysis response (or SSE stream if stream=true)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AIResponse"
+            text/event-stream:
+              schema:
+                type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/webhooks:
+    get:
+      operationId: listWebhooks
+      summary: List webhook subscriptions
+      description: Retrieve all active webhook subscriptions for the authenticated account.
+      tags: [Webhooks]
+      responses:
+        "200":
+          description: List of webhooks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Webhook"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+    post:
+      operationId: createWebhook
+      summary: Create webhook subscription
+      description: Create a new webhook subscription to receive event notifications at the specified HTTPS endpoint.
+      tags: [Webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url, events]
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  description: HTTPS endpoint to receive events
+                events:
+                  type: array
+                  items:
+                    type: string
+                    enum: [quote.update, price.alert, news.published, screener.match]
+                symbols:
+                  type: array
+                  items:
+                    type: string
+                  description: Filter events to specific symbols
+      responses:
+        "201":
+          description: Webhook created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Webhook"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/webhooks/{id}:
+    delete:
+      operationId: deleteWebhook
+      summary: Delete webhook subscription
+      description: Delete an existing webhook subscription by its unique identifier.
+      tags: [Webhooks]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Webhook deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/options/{symbol}:
+    get:
+      operationId: getOptionsChain
+      summary: Get options chain
+      description: Retrieve the full options chain for a symbol, optionally filtered by expiration date and option type.
+      tags: [Options]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: expiration
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter by expiration date
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [call, put]
+      responses:
+        "200":
+          description: Options chain data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptionsChain"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/options/{symbol}/expirations:
+    get:
+      operationId: getOptionsExpirations
+      summary: Get available expiration dates
+      description: Retrieve the list of available option expiration dates for a symbol.
+      tags: [Options]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Available expiration dates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: string
+                      format: date
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/analyst/{symbol}/consensus:
+    get:
+      operationId: getAnalystConsensus
+      summary: Get analyst consensus rating
+      description: Retrieve the aggregated analyst consensus rating and price target statistics for a symbol.
+      tags: [Analyst]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Analyst consensus data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalystConsensus"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/analyst/{symbol}/price-targets:
+    get:
+      operationId: getAnalystPriceTargets
+      summary: Get analyst price targets
+      description: Retrieve individual analyst price targets for a symbol.
+      tags: [Analyst]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of analyst price targets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PriceTarget"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/analyst/{symbol}/ratings:
+    get:
+      operationId: getAnalystRatings
+      summary: Get recent analyst rating changes
+      description: Retrieve recent analyst rating changes (upgrades, downgrades, initiations) for a symbol.
+      tags: [Analyst]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: List of rating changes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AnalystRating"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/earnings/{symbol}/history:
+    get:
+      operationId: getEarningsHistory
+      summary: Get historical earnings results
+      description: Retrieve historical earnings results for a symbol, including EPS and revenue actual vs. estimate.
+      tags: [Earnings]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 8
+      responses:
+        "200":
+          description: Historical earnings data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EarningsResult"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/earnings/calendar:
+    get:
+      operationId: getEarningsCalendar
+      summary: Get upcoming earnings calendar
+      description: Retrieve upcoming earnings calendar entries across all tracked companies, filterable by date range.
+      tags: [Earnings]
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Earnings calendar entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EarningsCalendarEntry"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/insider/{symbol}/transactions:
+    get:
+      operationId: getInsiderTransactions
+      summary: Get insider transactions
+      description: Retrieve a list of recent insider transactions (buys, sells, exercises) for a symbol.
+      tags: [Insider]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Insider transaction list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/InsiderTransaction"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/insider/{symbol}/summary:
+    get:
+      operationId: getInsiderSummary
+      summary: Get insider trading summary
+      description: Retrieve an aggregated summary of insider trading activity for a symbol over 30-day and 90-day periods.
+      tags: [Insider]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Insider trading summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InsiderSummary"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/developer/keys:
+    get:
+      operationId: listApiKeys
+      summary: List API keys
+      description: List all API keys for the authenticated user. Raw key values are never returned.
+      tags: [Developer]
+      responses:
+        "200":
+          description: List of API keys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ApiKey"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+    post:
+      operationId: createApiKey
+      summary: Create API key
+      description: Create a new API key. The raw key is returned only once in the response — store it securely.
+      tags: [Developer]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [label]
+              properties:
+                label:
+                  type: string
+                  description: Human-readable label for the key
+                scopes:
+                  type: array
+                  items:
+                    type: string
+                  description: Permission scopes for the key
+      responses:
+        "201":
+          description: API key created (includes raw key)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKeyCreated"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/developer/keys/{keyId}:
+    delete:
+      operationId: revokeApiKey
+      summary: Revoke API key
+      description: Permanently revoke an API key. This action cannot be undone.
+      tags: [Developer]
+      parameters:
+        - name: keyId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Key revoked
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/developer/usage:
+    get:
+      operationId: getUsage
+      summary: Get API usage
+      description: Get aggregated API usage statistics for the current billing period.
+      tags: [Developer]
+      responses:
+        "200":
+          description: Usage statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsageResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/developer/usage/daily:
+    get:
+      operationId: getDailyUsage
+      summary: Get daily usage breakdown
+      description: Get per-day, per-endpoint usage breakdown for the current billing period.
+      tags: [Developer]
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+            maximum: 90
+          description: Number of days to look back
+      responses:
+        "200":
+          description: Daily usage records
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DailyUsage"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/developer/plan:
+    get:
+      operationId: getPlan
+      summary: Get subscription plan
+      description: Get the authenticated user's active subscription details.
+      tags: [Developer]
+      responses:
+        "200":
+          description: Subscription plan details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlanResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /vq/developer/quota:
+    get:
+      operationId: getQuota
+      summary: Get API quota
+      description: Check remaining API and token quota for the current billing period.
+      tags: [Developer]
+      responses:
+        "200":
+          description: Quota information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuotaResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: "vq_live_..."
+
+  schemas:
+    Quote:
+      type: object
+      required: [symbol, price, change, changePct, volume, timestamp]
+      properties:
+        symbol:
+          type: string
+        price:
+          type: number
+        change:
+          type: number
+        changePct:
+          type: number
+        volume:
+          type: integer
+        dayHigh:
+          type: number
+        dayLow:
+          type: number
+        dayOpen:
+          type: number
+        previousClose:
+          type: number
+        marketCap:
+          type: number
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+
+    AIResponse:
+      type: object
+      properties:
+        content:
+          type: string
+        citations:
+          type: array
+          items:
+            type: object
+            properties:
+              source:
+                type: string
+              url:
+                type: string
+        usage:
+          type: object
+          properties:
+            promptTokens:
+              type: integer
+            completionTokens:
+              type: integer
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [message, type]
+          properties:
+            message:
+              type: string
+            type:
+              type: string
+            docs_url:
+              type: string
+        request_id:
+          type: string
+
+    Fundamental:
+      type: object
+      properties:
+        symbol:
+          type: string
+        companyName:
+          type: string
+        sector:
+          type: string
+        industry:
+          type: string
+        marketCap:
+          type: number
+        peRatio:
+          type: number
+          nullable: true
+        forwardPe:
+          type: number
+          nullable: true
+        eps:
+          type: number
+        dividendYield:
+          type: number
+          nullable: true
+        beta:
+          type: number
+        fiftyTwoWeekHigh:
+          type: number
+        fiftyTwoWeekLow:
+          type: number
+        avgVolume:
+          type: integer
+        sharesOutstanding:
+          type: integer
+        description:
+          type: string
+
+    IncomeStatement:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        period:
+          type: string
+          enum: [annual, quarterly]
+        revenue:
+          type: number
+        costOfRevenue:
+          type: number
+        grossProfit:
+          type: number
+        operatingIncome:
+          type: number
+        netIncome:
+          type: number
+        eps:
+          type: number
+        epsDiluted:
+          type: number
+
+    BalanceSheet:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        period:
+          type: string
+          enum: [annual, quarterly]
+        totalAssets:
+          type: number
+        totalLiabilities:
+          type: number
+        totalEquity:
+          type: number
+        cash:
+          type: number
+        totalDebt:
+          type: number
+        netDebt:
+          type: number
+
+    Technical:
+      type: object
+      properties:
+        symbol:
+          type: string
+        interval:
+          type: string
+        indicators:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/IndicatorValue"
+        candles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Candle"
+
+    IndicatorValue:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        value:
+          type: number
+
+    Candle:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        open:
+          type: number
+        high:
+          type: number
+        low:
+          type: number
+        close:
+          type: number
+        volume:
+          type: integer
+
+    NewsArticle:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        source:
+          type: string
+        url:
+          type: string
+          format: uri
+        publishedAt:
+          type: string
+          format: date-time
+        symbols:
+          type: array
+          items:
+            type: string
+        sentiment:
+          type: string
+          enum: [positive, negative, neutral]
+
+    ScreenerFilters:
+      type: object
+      properties:
+        marketCapMin:
+          type: number
+        marketCapMax:
+          type: number
+        peMin:
+          type: number
+        peMax:
+          type: number
+        sector:
+          type: string
+        industry:
+          type: string
+        dividendYieldMin:
+          type: number
+        volumeMin:
+          type: integer
+        exchange:
+          type: string
+          enum: [NYSE, NASDAQ, AMEX]
+        country:
+          type: string
+          default: US
+        sortBy:
+          type: string
+          default: market_cap
+          enum: [market_cap, pe_ratio, dividend_yield, volume, change_pct]
+        sortOrder:
+          type: string
+          default: desc
+          enum: [asc, desc]
+
+    ScreenerResult:
+      type: object
+      properties:
+        symbol:
+          type: string
+        companyName:
+          type: string
+        price:
+          type: number
+        changePct:
+          type: number
+        marketCap:
+          type: number
+        peRatio:
+          type: number
+          nullable: true
+        dividendYield:
+          type: number
+          nullable: true
+        sector:
+          type: string
+        industry:
+          type: string
+        volume:
+          type: integer
+        rsi14:
+          type: number
+          nullable: true
+
+    PageInfo:
+      type: object
+      properties:
+        hasNext:
+          type: boolean
+        cursor:
+          type: string
+          nullable: true
+        totalCount:
+          type: integer
+
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+        symbols:
+          type: array
+          items:
+            type: string
+        secret:
+          type: string
+          description: Signing secret (only returned on creation)
+        createdAt:
+          type: string
+          format: date-time
+        active:
+          type: boolean
+
+    OptionsChain:
+      type: object
+      properties:
+        symbol:
+          type: string
+        expirations:
+          type: array
+          items:
+            type: string
+            format: date
+        chain:
+          type: array
+          items:
+            $ref: "#/components/schemas/OptionContract"
+
+    OptionContract:
+      type: object
+      properties:
+        contractSymbol:
+          type: string
+        type:
+          type: string
+          enum: [call, put]
+        strike:
+          type: number
+        expiration:
+          type: string
+          format: date
+        bid:
+          type: number
+        ask:
+          type: number
+        lastPrice:
+          type: number
+        volume:
+          type: integer
+        openInterest:
+          type: integer
+        impliedVolatility:
+          type: number
+        delta:
+          type: number
+          nullable: true
+        gamma:
+          type: number
+          nullable: true
+        theta:
+          type: number
+          nullable: true
+
+    AnalystConsensus:
+      type: object
+      required: [symbol, consensus, totalAnalysts]
+      properties:
+        symbol:
+          type: string
+        consensus:
+          type: string
+          enum: [Strong Buy, Buy, Hold, Sell, Strong Sell]
+        targetHigh:
+          type: number
+        targetLow:
+          type: number
+        targetMean:
+          type: number
+        targetMedian:
+          type: number
+        totalAnalysts:
+          type: integer
+        buy:
+          type: integer
+        hold:
+          type: integer
+        sell:
+          type: integer
+
+    PriceTarget:
+      type: object
+      properties:
+        analystName:
+          type: string
+        firm:
+          type: string
+        target:
+          type: number
+        rating:
+          type: string
+        publishedAt:
+          type: string
+          format: date-time
+
+    AnalystRating:
+      type: object
+      properties:
+        analystName:
+          type: string
+        firm:
+          type: string
+        action:
+          type: string
+          enum: [initiated, upgraded, downgraded, reiterated]
+        fromRating:
+          type: string
+          nullable: true
+        toRating:
+          type: string
+        target:
+          type: number
+          nullable: true
+        publishedAt:
+          type: string
+          format: date-time
+
+    EarningsResult:
+      type: object
+      required: [symbol, date, fiscalQuarter]
+      properties:
+        symbol:
+          type: string
+        date:
+          type: string
+          format: date
+        fiscalQuarter:
+          type: string
+        epsActual:
+          type: number
+        epsEstimate:
+          type: number
+        epsSurprise:
+          type: number
+        epsSurprisePct:
+          type: number
+        revenueActual:
+          type: number
+        revenueEstimate:
+          type: number
+        revenueSurprisePct:
+          type: number
+
+    EarningsCalendarEntry:
+      type: object
+      required: [symbol, companyName, date, fiscalQuarter]
+      properties:
+        symbol:
+          type: string
+        companyName:
+          type: string
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+          enum: [before_market, after_market, during_market]
+        epsEstimate:
+          type: number
+          nullable: true
+        revenueEstimate:
+          type: number
+          nullable: true
+        fiscalQuarter:
+          type: string
+
+    InsiderTransaction:
+      type: object
+      properties:
+        symbol:
+          type: string
+        insiderName:
+          type: string
+        title:
+          type: string
+        transactionType:
+          type: string
+          enum: [buy, sell, exercise]
+        shares:
+          type: integer
+        price:
+          type: number
+        totalValue:
+          type: number
+        sharesOwnedAfter:
+          type: integer
+        filedAt:
+          type: string
+          format: date-time
+
+    InsiderSummary:
+      type: object
+      required: [symbol]
+      properties:
+        symbol:
+          type: string
+        netShares30d:
+          type: integer
+        netValue30d:
+          type: number
+        netShares90d:
+          type: integer
+        netValue90d:
+          type: number
+        buyCount90d:
+          type: integer
+        sellCount90d:
+          type: integer
+        mostRecentTransaction:
+          $ref: "#/components/schemas/InsiderTransaction"
+
+    ApiKey:
+      type: object
+      required: [id, keyPrefix, label, scopes, createdAt]
+      properties:
+        id:
+          type: string
+        keyPrefix:
+          type: string
+          description: First 8 characters of the key for identification
+        label:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    ApiKeyCreated:
+      type: object
+      required: [id, keyPrefix, label, scopes, rawKey, createdAt]
+      properties:
+        id:
+          type: string
+        keyPrefix:
+          type: string
+        label:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+        rawKey:
+          type: string
+          description: Full API key — returned only once on creation
+        createdAt:
+          type: string
+          format: date-time
+
+    UsageResponse:
+      type: object
+      properties:
+        period:
+          type: string
+        totalRequests:
+          type: integer
+        aiRequests:
+          type: integer
+        errorCount:
+          type: integer
+        tokensUsed:
+          type: integer
+        quotaLimit:
+          type: integer
+        quotaRemaining:
+          type: integer
+
+    DailyUsage:
+      type: object
+      properties:
+        day:
+          type: string
+          format: date
+        endpoint:
+          type: string
+        method:
+          type: string
+        callCount:
+          type: integer
+        errorCount:
+          type: integer
+        tokensUsed:
+          type: integer
+
+    PlanResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        planId:
+          type: string
+        planName:
+          type: string
+        status:
+          type: string
+        currentPeriodStart:
+          type: string
+          format: date-time
+        currentPeriodEnd:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    QuotaResponse:
+      type: object
+      properties:
+        planId:
+          type: string
+        monthlyQuota:
+          type: integer
+        used:
+          type: integer
+        remaining:
+          type: integer
+        overagePolicy:
+          type: string
+        resetAt:
+          type: string
+          format: date-time
+
+  responses:
+    Unauthorized:
+      description: Authentication failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          schema:
+            type: number
+        X-VQ-RateLimit-Limit:
+          schema:
+            type: integer
+        X-VQ-RateLimit-Remaining:
+          schema:
+            type: integer
+        X-VQ-RateLimit-Reset:
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

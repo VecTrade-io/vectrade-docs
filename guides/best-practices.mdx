@@ -1,0 +1,228 @@
+---
+title: Best Practices
+description: Production patterns, performance tips, and architectural guidance for building with the VecTrade API.
+---
+
+# Best Practices
+
+Battle-tested patterns for building production applications with VecTrade.
+
+## Architecture
+
+### Use Environment Variables for Configuration
+
+Never hardcode API keys or base URLs:
+
+```python
+# ✅ Environment-aware
+client = VecTrade()  # reads VECTRADE_API_KEY automatically
+
+# ✅ Explicit for multi-env deployments
+client = VecTrade(
+    api_key=os.environ["VECTRADE_API_KEY"],
+    base_url=os.environ.get("VECTRADE_BASE_URL", "https://api.vectrade.io/v1"),
+)
+```
+
+### Separate Read and Write Paths
+
+Use different API keys with scoped permissions for different concerns:
+
+```
+vq_live_readonly_*   → Market data reads (frontend, dashboards)
+vq_live_admin_*      → Webhook management, key rotation (backend only)
+```
+
+### Use Sandbox for Development
+
+```python
+# Development/testing — no rate limits, simulated data
+client = VecTrade(sandbox=True)
+
+# Production — real data, rate limits apply
+client = VecTrade()
+```
+
+## Performance
+
+### Batch Requests
+
+Reduce latency and rate limit consumption with batch endpoints:
+
+```python
+# ❌ 10 requests → 10 rate limit tokens
+for symbol in portfolio:
+    client.quotes.get(symbol)
+
+# ✅ 1 request → 1 rate limit token, lower latency
+quotes = client.quotes.batch(portfolio)
+```
+
+### Use Field Filtering
+
+Request only the fields you need to reduce payload size and latency:
+
+```python
+# Full response (~2KB)
+quote = client.quotes.get("AAPL")
+
+# Filtered response (~200B)
+quote = client.quotes.get("AAPL", fields=["price", "volume", "change_pct"])
+```
+
+### Cache Appropriately
+
+| Data Type | Recommended TTL | Reason |
+|-----------|----------------|--------|
+| Fundamentals | 1 hour | Updates quarterly |
+| Technicals | 1–5 min | Recalculated on new bars |
+| News | 5 min | New articles arrive frequently |
+| Quotes | 0 (no cache) | Real-time by nature |
+| Analyst Ratings | 15 min | Updates infrequently |
+| Options Chains | 1 min | Greeks change with price |
+
+### Use Async for Concurrent Fetches
+
+```python
+import asyncio
+from vectrade import AsyncVecTrade
+
+async def get_portfolio_data(symbols: list[str]):
+    client = AsyncVecTrade()
+    tasks = [client.quotes.get(s) for s in symbols]
+    return await asyncio.gather(*tasks)
+```
+
+## Reliability
+
+### Handle All Error Types
+
+```python
+from vectrade import (
+    VecTradeError,
+    AuthenticationError,
+    RateLimitError,
+    NotFoundError,
+    ServerError,
+)
+
+try:
+    quote = client.quotes.get(symbol)
+except AuthenticationError:
+    # Rotate key or alert ops
+    logger.critical("API key invalid — check rotation schedule")
+except RateLimitError as e:
+    # SDK retries automatically, but if exhausted:
+    logger.warning(f"Rate limited after retries. Reset in {e.retry_after}s")
+except NotFoundError:
+    # Symbol doesn't exist or was delisted
+    logger.info(f"{symbol} not found — may be delisted")
+except ServerError:
+    # 5xx — SDK retries automatically
+    logger.error("VecTrade server error after retries")
+except VecTradeError as e:
+    # Catch-all for unexpected API errors
+    logger.error(f"Unexpected: {e.type} - {e.message}")
+```
+
+### Implement Circuit Breakers
+
+For high-throughput applications, wrap API calls with a circuit breaker:
+
+```python
+from circuitbreaker import circuit
+
+@circuit(failure_threshold=5, recovery_timeout=30)
+def get_quote(symbol: str):
+    return client.quotes.get(symbol)
+```
+
+### Use Idempotency Keys
+
+For webhook creation and other write operations, use idempotency keys to prevent duplicates:
+
+```python
+webhook = client.webhooks.create(
+    url="https://app.example.com/hooks",
+    events=["price.alert"],
+    idempotency_key="setup-price-alerts-v1",
+)
+```
+
+## Security
+
+### Rotate API Keys Regularly
+
+```python
+# Create new key
+new_key = client.developer.create_key(name="rotation-2025-06")
+
+# Update your secrets manager
+update_secret("VECTRADE_API_KEY", new_key.key)
+
+# Delete old key after confirming new key works
+client.developer.delete_key(old_key_id)
+```
+
+### Verify Webhook Signatures
+
+**Always** verify HMAC signatures on incoming webhooks. Never trust payload data without verification:
+
+```python
+from vectrade import Webhooks
+
+def webhook_handler(request):
+    if not Webhooks.verify(
+        payload=request.body,
+        signature=request.headers["X-VQ-Signature"],
+        timestamp=request.headers["X-VQ-Timestamp"],
+        secret=WEBHOOK_SECRET,
+    ):
+        return Response(status=401)
+    # Process verified event
+```
+
+### Use Scoped Keys
+
+Create API keys with minimum required permissions:
+
+| Use Case | Recommended Scope |
+|----------|------------------|
+| Frontend display | `quotes:read`, `news:read` |
+| Screening tool | `screener:read`, `technicals:read` |
+| Webhook management | `webhooks:write` |
+| Full admin | All scopes (backend only) |
+
+## Monitoring
+
+### Track Rate Limit Usage
+
+```python
+response = client.quotes.get("AAPL")
+remaining = client.last_response.rate_limit.remaining
+total = client.last_response.rate_limit.limit
+
+if remaining < total * 0.1:
+    alert("Rate limit below 10% — consider upgrading or optimizing")
+```
+
+### Log Request IDs
+
+Every response includes a `request_id`. Log it for debugging:
+
+```python
+try:
+    quote = client.quotes.get("AAPL")
+except VecTradeError as e:
+    logger.error(f"Failed: {e.message} (request_id: {e.request_id})")
+    # Share request_id with VecTrade support for investigation
+```
+
+### Monitor Webhook Delivery Health
+
+```python
+webhooks = client.webhooks.list()
+for wh in webhooks:
+    if wh.consecutive_failures > 3:
+        logger.warning(f"Webhook {wh.id} failing: {wh.last_error}")
+```
