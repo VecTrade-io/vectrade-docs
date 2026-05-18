@@ -38,7 +38,7 @@
     },
     {
       "group": "SDKs",
-      "pages": ["sdks/python", "sdks/typescript", "sdks/cli", "sdks/finkit"]
+      "pages": ["sdks/python", "sdks/typescript", "sdks/cli", "sdks/finkit", "sdks/mcp"]
     }
   ],
   "openapi": "../openapi/spec.yaml",
