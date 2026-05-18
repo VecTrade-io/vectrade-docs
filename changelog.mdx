@@ -1,0 +1,66 @@
+---
+title: Changelog
+description: Release history and breaking changes across the VecTrade platform.
+---
+
+# Changelog
+
+Track releases across all VecTrade packages. Each SDK maintains its own `CHANGELOG.md` following [Keep a Changelog](https://keepachangelog.com/) format.
+
+## Latest Releases
+
+<CardGroup cols={2}>
+  <Card title="Python SDK" icon="python" href="https://github.com/VecTrade-io/vectrade-python/blob/main/CHANGELOG.md">
+    `vectrade` on PyPI
+  </Card>
+  <Card title="TypeScript SDK" icon="js" href="https://github.com/VecTrade-io/vectrade-node/blob/main/CHANGELOG.md">
+    `@vectrade/sdk` on npm
+  </Card>
+  <Card title="CLI" icon="terminal" href="https://github.com/VecTrade-io/vectrade-cli/blob/main/CHANGELOG.md">
+    `vectrade` binary releases
+  </Card>
+  <Card title="AI Provider" icon="brain" href="https://github.com/VecTrade-io/vectrade-ai-provider/blob/main/CHANGELOG.md">
+    `@vectrade/ai-provider` on npm
+  </Card>
+  <Card title="MCP Server" icon="plug" href="https://github.com/VecTrade-io/vectrade-mcp/blob/main/CHANGELOG.md">
+    `@vectrade/mcp`
+  </Card>
+  <Card title="FinKit" icon="chart-mixed" href="https://github.com/VecTrade-io/finkit/blob/main/CHANGELOG.md">
+    `vectrade-finkit` on PyPI
+  </Card>
+</CardGroup>
+
+## Versioning Policy
+
+All VecTrade packages follow [Semantic Versioning](https://semver.org/):
+
+- **Major** (1.0 → 2.0): Breaking changes to public API
+- **Minor** (1.0 → 1.1): New features, backward-compatible
+- **Patch** (1.0.0 → 1.0.1): Bug fixes, no API changes
+
+## Breaking Change Policy
+
+1. Breaking changes are announced **2 weeks** before release
+2. Deprecated features emit warnings for **1 minor version** before removal
+3. Migration guides are published for every major version bump
+4. The REST API maintains backward compatibility within a version (`v1`)
+
+## API Versioning
+
+| Version | Status | End of Life |
+|---------|--------|-------------|
+| `v1` | **Active** | — |
+
+The API is versioned in the URL path (`/v1/`). New endpoints are added without incrementing the version. Removing or changing existing endpoint behavior requires a new API version.
+
+## Release Cadence
+
+| Package | Cadence | Channel |
+|---------|---------|---------|
+| Python SDK | Weekly | PyPI |
+| TypeScript SDK | Weekly | npm |
+| CLI | Bi-weekly | GitHub Releases → Homebrew/Scoop |
+| AI Provider | Monthly | npm |
+| MCP Server | Monthly | npm/Docker |
+| FinKit | Monthly | PyPI |
+| OpenAPI Spec | As needed | GitHub |

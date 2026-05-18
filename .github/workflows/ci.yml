@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for broken internal links
+        run: npm run check-links
+
+      - name: Validate frontmatter
+        run: |
+          for f in $(find . -name "*.mdx" -not -path "./node_modules/*"); do
+            if ! head -1 "$f" | grep -q "^---"; then
+              echo "ERROR: $f missing frontmatter"
+              exit 1
+            fi
+          done
+          echo "All MDX files have frontmatter"
+
+      - name: Check for hardcoded secrets
+        run: |
+          if grep -rn 'vq_live_[a-zA-Z0-9]\{10,\}' --include="*.mdx" .; then
+            echo "ERROR: Found hardcoded live API keys!"
+            exit 1
+          fi
+          echo "No hardcoded secrets found"

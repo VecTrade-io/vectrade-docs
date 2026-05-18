@@ -1,0 +1,114 @@
+---
+title: SDK Generator
+description: Internal tool for validating SDK alignment with the OpenAPI spec and generating cross-language contract tests.
+---
+
+# SDK Generator
+
+The [vectrade-sdk-generator](https://github.com/VecTrade-io/vectrade-sdk-generator) is an internal tool that ensures all VecTrade SDKs remain aligned with the API contract defined in the OpenAPI spec.
+
+<Note>
+This tool is primarily for VecTrade SDK maintainers and contributors. End users should use the published SDKs directly.
+</Note>
+
+## What It Does
+
+1. **Contract Validation** — Verifies that SDK implementations match the OpenAPI spec exactly
+2. **Coverage Analysis** — Reports which endpoints each SDK covers
+3. **Alignment Testing** — Cross-references Python, Node, and CLI implementations
+4. **Report Generation** — Produces coverage reports for CI pipelines
+
+## Installation
+
+```bash
+git clone https://github.com/VecTrade-io/vectrade-sdk-generator.git
+cd vectrade-sdk-generator
+pip install -e ".[dev]"
+```
+
+## Usage
+
+### Validate Contracts
+
+```bash
+# Validate all SDK contracts against the OpenAPI spec
+vectrade-sdk-gen validate
+
+# Validate a specific SDK
+vectrade-sdk-gen validate --sdk python
+vectrade-sdk-gen validate --sdk node
+```
+
+### Generate Coverage Report
+
+```bash
+# Show endpoint coverage across all SDKs
+vectrade-sdk-gen coverage
+
+# Output as JSON
+vectrade-sdk-gen coverage --format json
+```
+
+### Run Alignment Check
+
+```bash
+# Compare SDK implementations for parity
+vectrade-sdk-gen align --spec ../vectrade-openapi/spec.yaml \
+  --python ../vectrade-python \
+  --node ../vectrade-node
+```
+
+## Contract Files
+
+The generator uses YAML contract files (one per resource group):
+
+```yaml
+# tests/contract/quotes.yaml
+resource: quotes
+endpoints:
+  - operation: getQuote
+    method: GET
+    path: /vq/quotes/{symbol}
+    params:
+      symbol: { type: string, required: true }
+    response:
+      type: object
+      properties: [symbol, price, change, change_pct, volume, timestamp]
+
+  - operation: batchQuotes
+    method: GET
+    path: /vq/quotes/batch
+    params:
+      tickers: { type: string, required: true }
+    response:
+      type: array
+```
+
+## CI Integration
+
+The SDK generator runs in CI for all SDK repositories:
+
+```yaml
+# .github/workflows/ci.yml
+- name: Contract validation
+  run: |
+    pip install vectrade-sdk-generator
+    vectrade-sdk-gen validate --spec spec.yaml --sdk .
+```
+
+## Architecture
+
+```
+vectrade-sdk-generator/
+├── src/vectrade_sdk_generator/
+│   ├── cli.py           # CLI entry point
+│   ├── contracts.py     # Contract YAML loader
+│   ├── coverage.py      # Coverage analyzer
+│   ├── reporter.py      # Report generation
+│   └── validator.py     # Alignment validator
+└── tests/contract/      # 15 YAML contract definitions
+```
+
+<Card title="GitHub Repository" icon="github" href="https://github.com/VecTrade-io/vectrade-sdk-generator">
+  Source code, contract definitions, and CI integration guides.
+</Card>

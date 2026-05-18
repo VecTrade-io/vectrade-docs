@@ -1,0 +1,13 @@
+{
+  "name": "@vectrade/docs",
+  "private": true,
+  "description": "VecTrade documentation source (Mintlify)",
+  "scripts": {
+    "dev": "mintlify dev",
+    "check-links": "node scripts/check-links.mjs",
+    "validate": "npm run check-links"
+  },
+  "devDependencies": {
+    "mintlify": "^4.0.0"
+  }
+}

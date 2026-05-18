@@ -6,9 +6,13 @@
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#6366f1",
-    "light": "#818cf8",
-    "dark": "#4f46e5"
+    "primary": "#0891B2",
+    "light": "#06B6D4",
+    "dark": "#0E7490",
+    "anchors": {
+      "from": "#0891B2",
+      "to": "#0E7490"
+    }
   },
   "topbarLinks": [
     { "name": "Dashboard", "url": "https://app.vectrade.io" }
@@ -21,27 +25,123 @@
     { "name": "API Reference", "url": "api-reference" },
     { "name": "SDKs", "url": "sdks" }
   ],
+  "anchors": [
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/VecTrade-io"
+    },
+    {
+      "name": "Status",
+      "icon": "signal",
+      "url": "https://status.vectrade.io"
+    }
+  ],
   "navigation": [
     {
       "group": "Getting Started",
-      "pages": ["introduction", "quickstart"]
+      "pages": ["introduction", "quickstart", "ecosystem", "changelog"]
     },
     {
       "group": "Guides",
       "pages": [
         "guides/authentication",
         "guides/error-handling",
+        "guides/pagination",
         "guides/streaming",
         "guides/rate-limits",
-        "guides/webhooks"
+        "guides/webhooks",
+        "guides/best-practices"
       ]
     },
     {
       "group": "SDKs",
-      "pages": ["sdks/python", "sdks/typescript", "sdks/cli"]
+      "pages": [
+        "sdks/python",
+        "sdks/typescript",
+        "sdks/cli",
+        "sdks/finkit",
+        "sdks/mcp",
+        "sdks/ai-provider"
+      ]
+    },
+    {
+      "group": "Resources",
+      "pages": [
+        "resources/examples",
+        "resources/openapi",
+        "resources/sdk-generator",
+        "resources/community"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": ["api-reference/overview"]
+    },
+    {
+      "group": "Market Data",
+      "pages": [
+        "api-reference/quotes/get-quote",
+        "api-reference/quotes/batch-quotes",
+        "api-reference/fundamentals/get-fundamentals",
+        "api-reference/fundamentals/income-statement",
+        "api-reference/fundamentals/balance-sheet",
+        "api-reference/technicals/get-technicals",
+        "api-reference/news/list-news",
+        "api-reference/news/get-article",
+        "api-reference/screener/run-screener"
+      ]
+    },
+    {
+      "group": "AI & Analysis",
+      "pages": [
+        "api-reference/ai/analyze",
+        "api-reference/analyst/consensus",
+        "api-reference/analyst/price-targets",
+        "api-reference/analyst/ratings",
+        "api-reference/earnings/history",
+        "api-reference/earnings/calendar",
+        "api-reference/insider/transactions",
+        "api-reference/insider/summary"
+      ]
+    },
+    {
+      "group": "Options & Events",
+      "pages": [
+        "api-reference/options/chain",
+        "api-reference/options/expirations",
+        "api-reference/webhooks/list",
+        "api-reference/webhooks/create",
+        "api-reference/webhooks/delete"
+      ]
+    },
+    {
+      "group": "Developer",
+      "pages": [
+        "api-reference/developer/list-keys",
+        "api-reference/developer/create-key",
+        "api-reference/developer/revoke-key",
+        "api-reference/developer/usage",
+        "api-reference/developer/daily-usage",
+        "api-reference/developer/plan",
+        "api-reference/developer/quota"
+      ]
     }
   ],
-  "openapi": "../openapi/spec.yaml",
+  "openapi": "openapi/spec.yaml",
+  "api": {
+    "baseUrl": [
+      { "url": "https://api.vectrade.io/v1", "name": "Production" },
+      { "url": "https://api-uat.vectrade.io/v1", "name": "UAT" }
+    ],
+    "auth": {
+      "method": "bearer",
+      "name": "Authorization"
+    },
+    "playground": {
+      "mode": "simple"
+    }
+  },
   "footerSocials": {
     "github": "https://github.com/VecTrade-io",
     "x": "https://x.com/vectrade"

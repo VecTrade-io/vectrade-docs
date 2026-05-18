@@ -1,0 +1,171 @@
+---
+title: Examples
+description: Copy-paste examples for common VecTrade use cases in Python, TypeScript, and cURL.
+---
+
+# Examples
+
+The [vectrade-examples](https://github.com/VecTrade-io/vectrade-examples) repository contains runnable code samples for every major use case.
+
+## Repository Structure
+
+```
+vectrade-examples/
+├── python/
+│   ├── quickstart.py          # First API call
+│   ├── streaming_ai.py        # Stream AI analysis
+│   ├── portfolio_tracker.py   # Live portfolio dashboard
+│   ├── screener.py            # Custom stock screener
+│   └── webhook_server.py      # Flask webhook receiver
+├── typescript/
+│   ├── quickstart.ts          # First API call
+│   ├── edge-function.ts       # Vercel Edge streaming
+│   ├── discord-bot.ts         # Discord price alerts
+│   └── ai-agent.ts            # AI agent with tools
+├── curl/
+│   └── examples.sh            # Raw HTTP examples
+└── notebooks/
+    ├── technical_analysis.ipynb
+    └── earnings_calendar.ipynb
+```
+
+## Python Quickstart
+
+```python
+from vectrade import VecTrade
+
+client = VecTrade()
+
+# Get a real-time quote
+quote = client.quotes.get("AAPL")
+print(f"{quote.symbol}: ${quote.price:.2f} ({quote.change_pct:+.2f}%)")
+
+# Batch multiple tickers
+batch = client.quotes.batch(["AAPL", "GOOGL", "MSFT", "NVDA"])
+for q in batch:
+    print(f"  {q.symbol}: ${q.price:.2f}")
+
+# AI analysis with streaming
+for chunk in client.ai.stream("What's the bull case for NVDA?"):
+    print(chunk.text, end="", flush=True)
+```
+
+## TypeScript Quickstart
+
+```typescript
+import { VecTrade } from "@vectrade/sdk";
+
+const client = new VecTrade();
+
+// Real-time quote
+const quote = await client.quotes.get("AAPL");
+console.log(`${quote.symbol}: $${quote.price}`);
+
+// Screen for undervalued large-caps
+const results = await client.screener.screen({
+  marketCap: { min: 10_000_000_000 },
+  pe: { max: 15 },
+  sector: "Technology",
+});
+
+for (const stock of results) {
+  console.log(`${stock.symbol} — P/E: ${stock.pe}, Market Cap: $${stock.marketCap}B`);
+}
+```
+
+## AI Agent with Tool Use
+
+```typescript
+import { createVecTrade } from "@vectrade/ai-provider";
+import { generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+const vt = createVecTrade();
+
+const { text } = await generateText({
+  model: openai("gpt-4o"),
+  tools: vt.tools(),
+  maxSteps: 5,
+  prompt: "Compare AAPL and MSFT fundamentals. Which is better value?",
+});
+
+console.log(text);
+```
+
+## MCP Integration (Claude Desktop)
+
+```json
+{
+  "mcpServers": {
+    "vectrade": {
+      "command": "npx",
+      "args": ["-y", "@vectrade/mcp"],
+      "env": { "VECTRADE_API_KEY": "vq_live_..." }
+    }
+  }
+}
+```
+
+Then ask Claude: *"What's TSLA trading at? Show me the options chain expiring this Friday."*
+
+## Webhook Receiver (Python)
+
+```python
+from flask import Flask, request
+from vectrade import verify_webhook
+
+app = Flask(__name__)
+WEBHOOK_SECRET = "whsec_..."
+
+@app.route("/webhook", methods=["POST"])
+def handle():
+    event = verify_webhook(
+        payload=request.data,
+        headers=request.headers,
+        secret=WEBHOOK_SECRET,
+    )
+
+    if event.type == "price_alert.triggered":
+        print(f"🚨 {event.data.symbol} hit ${event.data.price}")
+
+    return "", 200
+```
+
+## Jupyter Notebook
+
+```python
+# Technical analysis notebook
+from vectrade import VecTrade
+import pandas as pd
+
+client = VecTrade()
+technicals = client.technicals.get("AAPL", indicators=["RSI", "MACD", "BB"])
+
+df = pd.DataFrame({
+    "RSI": [technicals.rsi.value],
+    "MACD": [technicals.macd.value],
+    "Signal": [technicals.macd.signal],
+    "BB Upper": [technicals.bollinger.upper],
+    "BB Lower": [technicals.bollinger.lower],
+})
+df.style.highlight_max(axis=1)
+```
+
+## Run the Examples
+
+```bash
+git clone https://github.com/VecTrade-io/vectrade-examples.git
+cd vectrade-examples
+
+# Python
+pip install vectrade
+python python/quickstart.py
+
+# TypeScript
+npm install
+npx tsx typescript/quickstart.ts
+```
+
+<Card title="vectrade-examples on GitHub" icon="github" href="https://github.com/VecTrade-io/vectrade-examples">
+  Full source code with CI-tested examples for every SDK.
+</Card>
