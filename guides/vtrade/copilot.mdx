@@ -1,0 +1,433 @@
+---
+title: AI Copilot
+description: Complete guide to VTrade's conversational AI trading assistant — 59 specialized analysis tools, 6 analysis modes, autonomous trade execution, real-time market intelligence, and portfolio diagnostics via natural language interaction.
+---
+
+# AI Copilot
+
+VTrade Copilot is an AI-powered conversational trading assistant that combines large language model reasoning with real-time market data access. It functions as your personal research analyst, portfolio manager, and trading desk — accessible through a natural language chat interface.
+
+Copilot has access to 59 specialized tools spanning market data retrieval, fundamental analysis, technical analysis, portfolio diagnostics, stock screening, and autonomous order execution. You interact in plain language; Copilot determines which tools to invoke, retrieves the necessary data, synthesizes the results, and delivers actionable intelligence.
+
+<img src="/guides/vtrade/images/vectrade-vtrade-copilot-chat.png" alt="Copilot Chat — Active conversation showing tool execution, market analysis, and trade recommendation" />
+
+---
+
+## Accessing Copilot
+
+Navigate to **VTrade → Copilot** from the left sidebar.
+
+<img src="/guides/vtrade/images/vectrade-vtrade-copilot-new.png" alt="New Copilot Session — Fresh conversation with mode selector and prompt suggestions" />
+
+---
+
+## Interface Architecture
+
+### Left Panel — Conversation Management
+
+| Element | Function |
+|---------|----------|
+| **+ New Chat** | Initiates a fresh conversation context |
+| **Conversation History** | Chronological list of all past sessions (auto-titled from first message) |
+| **Search Bar** | Full-text search across all conversation history (appears with 3+ conversations) |
+| **Recent Recommendations** | Quick-access cards for the most recent trade recommendations generated |
+| **Usage Quota** | Circular progress indicator showing remaining daily prompt allowance |
+| **Catalysts** | Shortcut to the upcoming catalysts tracker |
+| **Thesis Manager** | Shortcut to investment thesis documents |
+
+### Main Panel — Conversation Thread
+
+The central area displays the conversation as an alternating message thread:
+
+**Your Messages:**
+- Displayed with your avatar and timestamp
+- Support markdown formatting, ticker mentions ($AAPL), and image uploads
+
+**Copilot Responses:**
+- **Tool Execution Badges** — Animated indicators showing which tools are being invoked in real-time:
+  - "Fetching AAPL quote..." → "Analyzing financials..." → "Running correlation..."
+  - Each badge shows tool category icon and descriptive label
+  - Execution timer shows elapsed processing time
+- **Thinking Indicator** — Animated dots while synthesizing data into a response
+- **Response Content** — Structured analysis with:
+  - Markdown formatting (headers, tables, bold/italic, code blocks)
+  - Interactive ticker links (clickable symbols navigate to stock detail pages)
+  - Embedded mini-charts when relevant
+  - Recommendation cards (detailed below)
+  - Follow-up suggestion chips
+
+### Input Area — Message Composition
+
+| Element | Function |
+|---------|----------|
+| **Text Input** | Auto-expanding textarea for natural language queries |
+| **Mode Chips** | Selectable analysis mode (above the input field) |
+| **Slash Command** | Type `/` to access command shortcuts |
+| **Send Button** | Submit message (or press Enter) |
+| **Stop Button** | Abort an in-progress response (replaces Send during generation) |
+
+---
+
+## Capabilities Overview
+
+Copilot understands and responds to a broad range of financial queries. Here is a structured overview of what you can ask:
+
+### Market Data & Quotes
+
+| Query Type | Example Prompts |
+|-----------|-----------------|
+| Current price | "What's AAPL trading at right now?" |
+| Historical price | "What was NVDA's price 6 months ago?" |
+| Intraday movement | "How has TSLA moved today? Show me the range." |
+| Sector overview | "How is the technology sector performing today?" |
+| Market breadth | "Is the market bullish or bearish right now? Show me breadth data." |
+| Macro indicators | "What's the current US 10-year yield and how has it moved this week?" |
+
+### Fundamental Analysis
+
+| Query Type | Example Prompts |
+|-----------|-----------------|
+| Valuation | "Is MSFT overvalued? Compare its P/E to sector median." |
+| Revenue analysis | "Break down AAPL's revenue by product segment." |
+| Earnings | "Did META beat estimates last quarter? By how much?" |
+| Balance sheet | "What's NVDA's debt-to-equity ratio and how does it compare to AMD?" |
+| Dividend analysis | "What's JNJ's dividend yield, payout ratio, and 10-year growth rate?" |
+| Cash flow | "Is AMZN generating positive free cash flow? Show me the trend." |
+
+### Technical Analysis
+
+| Query Type | Example Prompts |
+|-----------|-----------------|
+| Trend identification | "Is AAPL in an uptrend or downtrend on the daily chart?" |
+| Indicator readings | "What are the RSI and MACD saying about TSLA right now?" |
+| Support/resistance | "Where are the key support and resistance levels for NVDA?" |
+| Pattern recognition | "Is there a double bottom forming on AMD?" |
+| Moving averages | "Where is GOOGL relative to its 50-day and 200-day SMA?" |
+| Volume analysis | "Has AAPL volume been increasing or decreasing on this rally?" |
+
+### Portfolio Analysis
+
+| Query Type | Example Prompts |
+|-----------|-----------------|
+| Risk assessment | "Am I too concentrated in tech? What's my sector exposure?" |
+| Performance attribution | "Which positions are dragging my portfolio down?" |
+| Correlation analysis | "Are my holdings too correlated? Show me the correlation matrix." |
+| Optimization | "How can I reduce my portfolio's volatility without sacrificing return?" |
+| What-if scenarios | "What happens to my risk profile if I sell TSLA and buy JNJ?" |
+| Benchmark comparison | "How does my YTD return compare to the S&P 500?" |
+
+### Screening & Discovery
+
+| Query Type | Example Prompts |
+|-----------|-----------------|
+| Value screens | "Find undervalued large-caps with P/E below 15 and positive earnings growth." |
+| Growth screens | "Show me small-caps with revenue growth above 30% and positive free cash flow." |
+| Dividend screens | "Find dividend stocks yielding above 4% with less than 60% payout ratio." |
+| Technical screens | "Which stocks just crossed above their 200-day moving average?" |
+| Momentum screens | "Show me the top 10 stocks by 3-month momentum in the S&P 500." |
+| Event-driven | "Which stocks report earnings this week?" |
+
+### Trade Execution (With Confirmation)
+
+| Query Type | Example Prompts |
+|-----------|-----------------|
+| Market orders | "Buy 10 shares of AAPL at market." |
+| Limit orders | "Place a limit buy for 20 NVDA at $800." |
+| Stop-loss | "Set a stop-loss on my TSLA position at $175." |
+| Bracket orders | "Buy 50 MSFT with take-profit at $450 and stop-loss at $380." |
+| Position close | "Close my entire AMD position." |
+| Order cancellation | "Cancel all my open orders on AAPL." |
+
+<Warning>
+Trade execution through Copilot always requires explicit user confirmation before submission. Copilot will present the order details and ask "Shall I proceed?" — you must confirm before any order is placed.
+</Warning>
+
+---
+
+## Tool Categories
+
+Copilot's 59 tools are organized into functional categories:
+
+### Market Data Tools (14 tools)
+
+| Tool | Data Retrieved |
+|------|---------------|
+| Live Quote | Current price, bid/ask, volume, change, 52-week range |
+| Historical Prices | OHLCV data for any time range |
+| Key Statistics / Fundamentals | Fundamental ratios and trading stats |
+| Analyst Ratings | Consensus rating, price targets, upgrades/downgrades |
+| Upgrades & Downgrades | Recent analyst rating changes |
+| Earnings Data | EPS history, estimates, surprise %, next date |
+| Earnings Calendar | Upcoming earnings dates across the market |
+| Earnings Surprises | Historical beat/miss record and magnitude |
+| Dividend Info | Yield, payout ratio, ex-date, growth history |
+| Options Chain | Full chain with Greeks and IV for all expirations |
+| News Feed | Recent headlines for a ticker |
+| Insider Trading | Form 4 filings — buys and sells by executives |
+| Insider Roster | Full list of company insiders |
+| Macro Indicators | Yields, Fed funds rate, CPI, unemployment, GDP |
+
+### Research Tools (14 tools)
+
+| Tool | Data Retrieved |
+|------|---------------|
+| Financial Statements | Income, balance sheet, cash flow (quarterly/annual) |
+| TTM Financials | Trailing twelve months financial data |
+| SEC Filings | 10-K, 10-Q, 8-K documents |
+| Congressional Trades | Stock transactions by US legislators |
+| ESG / Sustainability | Environmental, Social, Governance ratings |
+| Revenue Breakdown | Segment and geographic revenue decomposition |
+| Factor Exposure | Value, momentum, quality, size factor loadings |
+| Forward Estimates | Analyst consensus forward estimates |
+| Growth Estimates | Revenue and earnings growth projections |
+| Earnings Estimates | Detailed EPS estimate breakdown |
+| Institutional Holdings | 13F filings — major fund positions |
+| Mutual Fund Holders | Mutual fund ownership data |
+| Volume Profile | Price-volume distribution for key levels |
+| Core Analysis | ML-powered comprehensive stock analysis |
+
+### Portfolio Tools (8 tools)
+
+| Tool | Data Retrieved |
+|------|---------------|
+| Portfolio Context | Current holdings with real-time P&L |
+| Position History | Closed trades and their outcomes |
+| Equity Curve | Historical portfolio value time series |
+| Margin Status | Utilization, buying power, maintenance requirement |
+| Activity Feed | Social feed of trades from users you follow |
+| Correlation | Pairwise correlation between holdings |
+| What-If Simulation | Model hypothetical portfolio changes |
+| Rebalance Plan | Calculate trades needed to reach target allocation |
+
+### Screening & Analysis Tools (7 tools)
+
+| Tool | Capability |
+|------|-----------|
+| Stock Comparison | Multi-ticker side-by-side fundamental/technical comparison |
+| Stock Screener | Apply complex multi-criteria filters (templates or custom) |
+| Search Assets | Search for stocks by name or keyword |
+| Sector Performance | Sector-level performance data |
+| Sector Rotation | Ranks all 11 GICS sectors by 1M/3M/YTD performance |
+| Relative Strength | Relative performance vs benchmark |
+| Risk Score | Composite risk assessment for a ticker |
+
+### Intelligence Tools (7 tools)
+
+| Tool | Capability |
+|------|-----------|
+| Sentiment Analysis | Market sentiment scoring for a ticker |
+| ML Prediction | Machine-learning-based price forecast |
+| Technicals | RSI, MACD, moving averages, support/resistance |
+| Option Greeks | Black-Scholes Greeks calculation |
+| Catalyst Tracker | Upcoming events for holdings |
+| Backtest | Simple strategy backtesting |
+| Briefing | Personalised market briefing generation |
+
+### Trading Tools (9 tools)
+
+| Tool | Capability |
+|------|-----------|
+| Place Order | Submit market/limit/stop/stop-limit/trailing-stop orders |
+| Place Bracket Order | Entry + take-profit + stop-loss linked orders |
+| Place OCO Order | One-cancels-other order pair |
+| Cancel Order | Cancel pending/working orders |
+| Close Position | Close an entire position (or partial quantity) |
+| Short Sell Locate | Check borrow availability and difficulty tier |
+| Create Price Rule | Conditional price-triggered orders |
+| List Price Rules | View all active price rules |
+| Cancel Price Rule | Remove an active price rule |
+
+<Tip>
+You never need to know tool names or invoke them manually. Simply describe what you want in natural language and Copilot automatically determines which tools are required, executes them in the optimal sequence, and synthesizes the results into a coherent response.
+</Tip>
+
+---
+
+## Analysis Modes
+
+Mode selection controls the analytical approach and tool selection bias. Select a mode from the chips above the input area:
+
+| Mode | Behavior | Best For |
+|------|----------|----------|
+| **Auto** | Copilot determines the optimal approach based on your query | General use — appropriate 90% of the time |
+| **Research** | Prioritizes fundamental data: financial statements, filings, ownership, revenue breakdown | Deep-dive fundamental analysis, earnings research |
+| **Trading** | Prioritizes technical data: price action, indicators, support/resistance, momentum | Entry/exit timing, chart analysis, day trading |
+| **Portfolio** | Focuses on your holdings: risk metrics, attribution, correlation, optimization | Portfolio review, risk management, rebalancing |
+| **Earnings** | Emphasizes earnings-specific data: estimates, surprises, guidance, revision history | Pre-earnings research, post-earnings analysis |
+| **Scanner** | Optimized for screening: applies multi-criteria filters, returns ranked results | Idea generation, watchlist building, opportunity discovery |
+
+**Mode Behavior Details:**
+
+In **Auto** mode (recommended default), Copilot analyzes your query semantics to determine the appropriate tool set. For example:
+- "Is AAPL overvalued?" → triggers Research mode tools (P/E comparison, DCF model, peer analysis)
+- "Where should I set my stop on NVDA?" → triggers Trading mode tools (support levels, ATR-based stop calculation)
+- "Am I too concentrated?" → triggers Portfolio mode tools (sector exposure, correlation matrix)
+
+Switch to a specific mode when you want to force a particular analytical depth — for example, selecting **Research** ensures the full financial statement pull even for simple-sounding questions.
+
+---
+
+## Trade Recommendations
+
+When Copilot's analysis identifies a potential trade opportunity, it generates a structured **Recommendation Card**:
+
+### Recommendation Card Components
+
+| Field | Content |
+|-------|---------|
+| **Action** | BUY / SELL / HOLD — displayed as a color-coded badge (green/red/grey) |
+| **Symbol** | Target instrument with exchange badge |
+| **Confidence** | Low (< 40%) / Medium (40–70%) / High (> 70%) — based on signal convergence |
+| **Entry Price** | Suggested entry level (current price for market, target for limit) |
+| **Target Price** | Price objective / take-profit level |
+| **Stop-Loss** | Suggested risk management exit level |
+| **Risk/Reward** | Ratio of potential profit to potential loss (e.g., 2.5:1) |
+| **Timeframe** | Expected holding period: Intraday / Swing (1–5 days) / Position (1–12 weeks) / Long-term (3+ months) |
+| **Rationale** | 3–5 bullet points explaining the thesis |
+| **Risk Factors** | 2–3 bullet points identifying what could invalidate the thesis |
+| **Portfolio Impact** | How executing this trade would change your sector allocation, concentration, and beta |
+
+### Interacting with Recommendations
+
+| Action | Result |
+|--------|--------|
+| **Execute** | Opens Trading Desk with order pre-filled (symbol, side, quantity, price) |
+| **👍 Thumbs Up** | Rates recommendation as useful — improves future personalization |
+| **👎 Thumbs Down** | Rates recommendation as unhelpful — adjusts future behavior |
+| **Save** | Bookmarks the recommendation to the sidebar for later reference |
+| **Share** | Creates a shareable post of the recommendation for your social feed |
+
+---
+
+## Follow-Up Suggestions
+
+After each response, Copilot generates 3–5 contextually relevant follow-up questions displayed as clickable chips. These accelerate the research workflow by suggesting logical next steps.
+
+**Example — After analyzing NVDA:**
+> → "Compare NVDA to AMD on key metrics"
+> → "Show me NVDA's options chain for next month"
+> → "What's the insider trading activity in the last 90 days?"
+> → "Is this a good entry point based on technicals?"
+> → "How would adding NVDA change my portfolio risk?"
+
+Click any chip to send it as your next message without typing.
+
+---
+
+## Slash Commands
+
+Type `/` at the beginning of your message to access command shortcuts:
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/compare` | Side-by-side comparison of 2–5 securities | `/compare MSFT GOOGL META` |
+| `/dcf` | Discounted cash flow valuation model | `/dcf NVDA` |
+| `/earnings` | Earnings analysis and upcoming dates | `/earnings AAPL` |
+| `/risk` | Portfolio risk report (VaR, correlations, concentration) | `/risk` |
+| `/screen` | Run a stock screen with natural language criteria | `/screen undervalued tech with high growth` |
+| `/briefing` | Personalised market briefing and portfolio summary | `/briefing` |
+| `/sector` | Sector rotation and performance analysis | `/sector` |
+| `/watchlist` | Watchlist overview and trend analysis | `/watchlist` |
+
+Navigate the command autocomplete with ↑↓ arrow keys; press Tab or Enter to select.
+
+---
+
+## Conversation Management
+
+### History & Organization
+
+- **All conversations are automatically saved** and accessible from the left panel
+- **Auto-titling** — Conversations are named based on your first message content
+- **Chronological ordering** — Most recent conversations appear at the top
+- **Search** — Full-text search across all historical conversations (by keyword, ticker, or topic)
+
+### Actions
+
+| Action | Method |
+|--------|--------|
+| Start new conversation | Click **+ New Chat** in the sidebar |
+| Find old conversation | Use the search field in the sidebar |
+| Delete conversation | Hover over conversation title → click trash icon → confirm |
+| Continue a conversation | Click any historical conversation to resume it |
+
+### Context Windows
+
+Each conversation maintains its own context. Copilot remembers:
+- All previous messages in the current conversation
+- Your portfolio state (positions, balance)
+- Preferences inferred from your interactions
+- Previously generated recommendations
+
+Starting a **New Chat** creates a clean context — use this when switching to an unrelated topic.
+
+---
+
+## Usage Quotas & Rate Limits
+
+Your subscription plan determines daily Copilot usage:
+
+| Plan | Daily Message Limit | Token Budget | Priority |
+|------|--------------------:|-------------:|----------|
+| **Free** | 10 messages | Standard | Normal queue |
+| **Pro** | 50 messages | Extended | Priority queue |
+| **Premium** | Unlimited | Maximum | Dedicated capacity |
+
+**Quota Indicators:**
+- **Quota Ring** (sidebar) — Circular progress indicator showing % consumed
+- **Color States:** Green (> 50% remaining) → Amber (10–50% remaining) → Red (< 10% remaining)
+- **Exhausted State:** Input bar disables with message: "Daily limit reached. Resets at 00:00 UTC or upgrade for more."
+
+**Reset Schedule:** Quotas reset daily at midnight UTC.
+
+---
+
+## Catalysts Tracker
+
+Access via the **Catalysts** link in the Copilot sidebar.
+
+The Catalysts Tracker monitors upcoming events that could materially affect your portfolio holdings:
+
+| Event Type | Data Source | Lead Time |
+|-----------|-------------|-----------|
+| Earnings Announcements | Company IR calendars | 2–6 weeks ahead |
+| Dividend Dates | Ex-date, record date, payment date | 4–6 weeks ahead |
+| FDA Decisions | PDUFA calendar (biotech/pharma holdings) | Known dates |
+| Product Launches | Press releases, confirmed events | As announced |
+| Fed Meetings (FOMC) | Federal Reserve schedule | Published annually |
+| Macro Data Releases | BLS, Census, Fed calendar | Published schedule |
+| Options Expiration | Monthly/weekly OpEx dates | Standard schedule |
+| Index Rebalancing | S&P, NASDAQ rebalance dates | Quarterly |
+
+Events are sorted chronologically with the nearest events first. Each entry shows: event type badge, date, instrument affected, and potential impact assessment (High / Medium / Low).
+
+---
+
+## Investment Thesis Manager
+
+Access via the **Thesis Manager** link in the Copilot sidebar.
+
+The Thesis Manager provides a structured framework for documenting and tracking investment theses:
+
+### Thesis Document Structure
+
+| Section | Content |
+|---------|---------|
+| **Symbol & Direction** | Ticker, Long or Short, Date created |
+| **Core Thesis** | 2–3 sentence summary of your investment rationale |
+| **Bull Case** | Optimistic scenario and supporting evidence |
+| **Bear Case** | Pessimistic scenario and risk factors |
+| **Catalysts** | Upcoming events that could validate or invalidate the thesis |
+| **Key Metrics to Watch** | Specific numbers or indicators that confirm/deny the thesis |
+| **Entry Criteria** | Price levels or conditions for entering the trade |
+| **Exit Criteria** | Take-profit and stop-loss conditions |
+| **Current Status** | Active / Validated / Invalidated / Expired |
+| **Updates** | Timestamped notes as new information emerges |
+
+### Thesis Actions
+
+- **Create** — Build a new thesis from scratch (or ask Copilot to generate a draft based on current data)
+- **Update** — Ask Copilot to refresh a thesis with the latest fundamentals, technicals, and news
+- **Validate** — Check whether your thesis conditions are being met
+- **Export** — Share a thesis as a formatted post to your trading group
+- **Archive** — Move completed/invalidated theses to history
