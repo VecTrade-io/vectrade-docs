@@ -1,0 +1,468 @@
+---
+title: Developer Portal
+description: Complete guide to the VTrade Developer Portal — API key lifecycle management, usage monitoring and analytics, rate limit policies, authentication protocols, and quickstart integration examples across multiple languages.
+---
+
+# Developer Portal
+
+The Developer Portal provides programmatic access to VTrade's market data, trading engine, and portfolio management capabilities via a RESTful API. Build automated trading strategies, custom analytics dashboards, external alert systems, or integrate VTrade functionality into third-party applications.
+
+<img src="/guides/vtrade/images/vectrade-vtrade-developer.png" alt="Developer Portal — Dashboard showing API statistics, active keys, and usage overview" />
+
+---
+
+## Access Requirements
+
+Navigate to **VTrade → Developer** from the left sidebar.
+
+<Warning>
+The Developer Portal requires an active paid subscription plan. Free-tier accounts do not have API access. If you see a "No Active Subscription" screen, navigate to Settings → Subscription to upgrade your plan. Upon activation, the Developer Portal becomes immediately accessible.
+</Warning>
+
+### Subscription Tiers & API Entitlements
+
+| Plan | API Access | Rate Limit | Daily Quota | Concurrent Keys |
+|------|-----------|------------|-------------|-----------------|
+| **Free** | ❌ No access | — | — | — |
+| **Basic** | ✓ Read-only (market data + portfolio) | 30 req/min | 1,000 req/day | 2 keys |
+| **Pro** | ✓ Full access (read + write + trade) | 120 req/min | 10,000 req/day | 5 keys |
+| **Premium** | ✓ Full access + priority routing | 600 req/min | 100,000 req/day | 10 keys |
+
+---
+
+## Overview Dashboard
+
+The Overview tab provides at-a-glance operational intelligence about your API usage, health status, and consumption trends.
+
+<img src="/guides/vtrade/images/vectrade-vtrade-developer-overview.png" alt="Developer Overview — Real-time API statistics with 30-day usage chart and health indicators" />
+
+### Summary Metrics
+
+| Metric | Description |
+|--------|-------------|
+| **Total Requests (Lifetime)** | Cumulative API calls since account API activation |
+| **Requests Today** | Calls made in the current 24-hour window (resets at 00:00 UTC) |
+| **Active Keys** | Number of non-revoked API keys currently provisioned |
+| **Error Rate (24h)** | Percentage of requests returning 4xx or 5xx status codes |
+| **Avg. Response Time** | Mean API response latency over the past 24 hours |
+| **Rate Limit Status** | Current utilization as percentage of your plan's per-minute limit |
+
+### 30-Day Usage Chart
+
+An interactive line/bar chart displaying daily request volumes over the past 30 days:
+- **Primary axis:** Total requests per day (bar chart)
+- **Secondary axis:** Error count per day (line overlay, red)
+- **Hover tooltip:** Date, total requests, success count, error count, avg. latency
+- **Trend line:** 7-day moving average to identify usage patterns
+
+### Health Status Indicators
+
+| Indicator | States |
+|-----------|--------|
+| **API Availability** | Operational (green) / Degraded (amber) / Outage (red) |
+| **Latency** | Normal (< 200ms) / Elevated (200–500ms) / High (> 500ms) |
+| **Rate Limit Headroom** | Comfortable (< 50% used) / Approaching (50–80%) / Critical (> 80%) |
+
+---
+
+## API Key Management
+
+API keys authenticate all programmatic requests to VTrade's API. Each key is a unique credential that should be treated with the same security as a password.
+
+<img src="/guides/vtrade/images/vectrade-vtrade-developer-api-keys.png" alt="API Keys — Key listing with creation, masking, last-used timestamps, and revocation controls" />
+
+### Key Architecture
+
+VTrade API keys follow the format: `vtrd_live_` followed by 48 alphanumeric characters.
+- **Prefix:** `vtrd_live_` (identifies the key as a VTrade production credential)
+- **Payload:** 48-character cryptographically random string
+- **Example:** `vtrd_live_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4`
+
+### Creating a New API Key
+
+1. Navigate to the **API Keys** tab
+2. Click **+ Create API Key**
+3. Enter a **label** — a human-readable identifier describing the key's purpose:
+   - Best practice: Name by project/application (e.g., "Trading Bot - Production", "Dashboard - Staging", "Alert System")
+4. Optionally select **permissions** (if your plan supports scoped keys):
+   - Read Only (market data + portfolio queries)
+   - Read + Write (includes order placement and modification)
+   - Full Access (all endpoints including account management)
+5. Click **Generate**
+6. The full key is displayed **exactly once** in a copy dialog
+
+<Warning>
+**Critical Security Notice:** The complete API key is displayed only at the moment of creation. After you close the generation dialog, the key is irreversibly masked and cannot be retrieved. Copy it immediately and store it in a secure location (password manager, encrypted environment variable, or secrets management service). If you lose the key, you must revoke it and generate a new one.
+</Warning>
+
+### Key Storage Best Practices
+
+| ✅ Do | ❌ Do Not |
+|--------|-----------|
+| Store in environment variables | Hard-code in source files |
+| Use a secrets manager (HashiCorp Vault, AWS Secrets Manager, 1Password) | Commit to version control (Git) |
+| Restrict file permissions (0600) for key files | Share via unencrypted channels (email, chat) |
+| Rotate keys periodically (every 90 days recommended) | Expose in client-side / browser JavaScript |
+| Use separate keys per application/environment | Use a single key for all purposes |
+
+### API Keys Table
+
+| Column | Description |
+|--------|-------------|
+| Label | User-assigned descriptive name |
+| Key (Masked) | First 10 + last 4 characters visible (e.g., `vtrd_live_a...x4`) |
+| Permissions | Read / Read+Write / Full Access |
+| Created | ISO timestamp of key generation |
+| Last Used | Timestamp of most recent successful API call using this key |
+| Requests (24h) | Number of requests made with this key in the past 24 hours |
+| Status | Active ✓ / Revoked ✗ |
+| Actions | Revoke button |
+
+### Revoking an API Key
+
+If a key is compromised, no longer needed, or being rotated:
+
+1. Locate the key in the table
+2. Click **Revoke**
+3. Confirm the action in the dialog (this is irreversible)
+4. **Immediate effect:** All subsequent requests using this key receive `401 Unauthorized`
+5. The key remains in the table (grayed out, marked "Revoked") for audit purposes
+
+<Tip>
+Create separate API keys for each application, environment (dev/staging/prod), and team member. This practice ensures that revoking a compromised key affects only one integration point, minimizing disruption to your other systems.
+</Tip>
+
+### Key Rotation Workflow
+
+Recommended procedure for rotating API keys without downtime:
+
+1. **Create** a new key with the same label + "(v2)" suffix
+2. **Update** your application configuration to use the new key
+3. **Verify** the new key works correctly (make a test API call)
+4. **Revoke** the old key
+5. **Monitor** for any 401 errors that indicate missed configuration points
+
+---
+
+## Usage Analytics
+
+The Usage tab provides comprehensive API consumption analytics, helping you monitor request patterns, identify errors, and optimize your integration.
+
+<img src="/guides/vtrade/images/vectrade-vtrade-developer-usage.png" alt="API Usage — Detailed consumption analytics with endpoint breakdown and error analysis" />
+
+### Usage Chart (Interactive)
+
+A configurable chart displaying request metrics over time:
+
+**View Options:**
+| Dimension | Breakdown |
+|-----------|-----------|
+| **By Endpoint Category** | Market Data / Trading / Portfolio / Copilot / Alerts |
+| **By Response Status** | 2xx (Success) / 4xx (Client Error) / 5xx (Server Error) |
+| **By API Key** | Per-key usage (if multiple keys active) |
+| **By Hour** | Hourly distribution within a day (identifies peak usage times) |
+
+**Time Range:** Last 24 hours, Last 7 days, Last 30 days, Custom range
+
+### Daily Breakdown Table
+
+| Column | Description |
+|--------|-------------|
+| Date | Calendar date |
+| Total Requests | Sum of all API calls |
+| Successful (2xx) | Requests returning success status |
+| Client Errors (4xx) | Authentication failures, validation errors, not found |
+| Server Errors (5xx) | Internal server errors (should be near-zero) |
+| Success Rate | Successful ÷ Total (as percentage) |
+| Avg. Latency | Mean response time in milliseconds |
+| P95 Latency | 95th percentile response time |
+| Top Endpoint | Most-called endpoint path |
+| Peak Minute | Highest requests-per-minute value observed |
+
+### Error Analysis
+
+A dedicated error breakdown panel showing:
+- **Error code distribution** — Pie chart of 400, 401, 403, 404, 429, 500 responses
+- **Recent errors** — Table of last 50 error responses with timestamp, endpoint, status code, and error message
+- **Error trend** — Is your error rate increasing, stable, or decreasing?
+
+### Rate Limit Monitoring
+
+Real-time rate limit telemetry:
+
+| Metric | Description |
+|--------|-------------|
+| Current Rate | Requests in the current sliding 60-second window |
+| Plan Limit | Maximum requests per minute for your subscription |
+| Utilization % | Current / Limit as percentage |
+| Throttled Requests (24h) | Number of requests that received 429 status |
+| Daily Quota Used | Requests today / Daily limit |
+| Daily Quota Remaining | Requests available before daily limit |
+
+**Rate Limit Response:**
+When you exceed your per-minute rate limit, the API returns:
+```
+HTTP/1.1 429 Too Many Requests
+Retry-After: 12
+X-RateLimit-Limit: 120
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1716220800
+```
+
+**Headers included in every response:**
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Your plan's per-minute limit |
+| `X-RateLimit-Remaining` | Requests remaining in current window |
+| `X-RateLimit-Reset` | Unix timestamp when the window resets |
+
+---
+
+## Authentication
+
+All API requests must include your API key in the Authorization header using the Bearer token scheme:
+
+```
+Authorization: Bearer vtrd_live_your_api_key_here
+```
+
+**Authentication Errors:**
+
+| Status Code | Meaning | Resolution |
+|-------------|---------|------------|
+| `401 Unauthorized` | Missing or invalid API key | Verify key is correct and not revoked |
+| `403 Forbidden` | Key lacks required permissions | Use a key with appropriate scope |
+| `429 Too Many Requests` | Rate limit exceeded | Wait for Retry-After seconds, then retry |
+
+---
+
+## Quick Start Examples
+
+### cURL — Get a Stock Quote
+
+```bash
+curl -X GET "https://api.vectrade.com/v1/market/quote?symbol=AAPL" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Accept: application/json"
+```
+
+**Response:**
+```json
+{
+  "symbol": "AAPL",
+  "exchange": "NASDAQ",
+  "price": 189.45,
+  "bid": 189.43,
+  "ask": 189.47,
+  "change": 2.31,
+  "changePercent": 1.24,
+  "volume": 52341000,
+  "avgVolume": 48200000,
+  "marketCap": 2940000000000,
+  "dayHigh": 190.12,
+  "dayLow": 186.80,
+  "previousClose": 187.14,
+  "timestamp": "2024-01-15T16:00:00Z"
+}
+```
+
+### cURL — Place a Limit Order
+
+```bash
+curl -X POST "https://api.vectrade.com/v1/trading/orders" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "symbol": "AAPL",
+    "exchange": "NASDAQ",
+    "side": "BUY",
+    "orderType": "LIMIT",
+    "quantity": 10,
+    "limitPrice": 185.00,
+    "timeInForce": "GTC"
+  }'
+```
+
+**Response:**
+```json
+{
+  "orderId": "ord_8f3a2b1c4d5e6f7a",
+  "symbol": "AAPL",
+  "side": "BUY",
+  "orderType": "LIMIT",
+  "quantity": 10,
+  "limitPrice": 185.00,
+  "timeInForce": "GTC",
+  "status": "WORKING",
+  "createdAt": "2024-01-15T14:23:45Z"
+}
+```
+
+### cURL — Get Portfolio Positions
+
+```bash
+curl -X GET "https://api.vectrade.com/v1/portfolio/positions" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+**Response:**
+```json
+{
+  "positions": [
+    {
+      "symbol": "AAPL",
+      "exchange": "NASDAQ",
+      "side": "LONG",
+      "quantity": 50,
+      "averageCost": 178.32,
+      "currentPrice": 189.45,
+      "marketValue": 9472.50,
+      "unrealizedPnl": 556.50,
+      "unrealizedPnlPercent": 6.24,
+      "weight": 12.3
+    }
+  ],
+  "totalEquity": 1052340.00,
+  "cashBalance": 876200.00
+}
+```
+
+### Python SDK
+
+```python
+from vectrade import VecTrade
+
+# Initialize client with API key
+client = VecTrade(api_key="vtrd_live_your_api_key_here")
+
+# --- Market Data ---
+quote = client.market.get_quote(symbol="AAPL")
+print(f"{quote.symbol}: ${quote.price} ({quote.change_percent:+.2f}%)")
+
+# Get historical data
+history = client.market.get_history(
+    symbol="NVDA",
+    interval="1d",
+    period="6mo"
+)
+for candle in history[-5:]:
+    print(f"  {candle.date}: O={candle.open} H={candle.high} L={candle.low} C={candle.close}")
+
+# --- Trading ---
+# Place a market order
+order = client.trading.place_order(
+    symbol="AAPL",
+    exchange="NASDAQ",
+    side="BUY",
+    order_type="MARKET",
+    quantity=10
+)
+print(f"Order {order.id}: {order.status} — filled at ${order.fill_price}")
+
+# Place a limit order with GTC
+limit_order = client.trading.place_order(
+    symbol="NVDA",
+    exchange="NASDAQ",
+    side="BUY",
+    order_type="LIMIT",
+    quantity=5,
+    limit_price=800.00,
+    time_in_force="GTC"
+)
+
+# Cancel an order
+client.trading.cancel_order(order_id=limit_order.id)
+
+# --- Portfolio ---
+positions = client.portfolio.get_positions()
+for pos in positions:
+    pnl_emoji = "📈" if pos.unrealized_pnl > 0 else "📉"
+    print(f"  {pnl_emoji} {pos.symbol}: {pos.quantity} shares, P&L: ${pos.unrealized_pnl:.2f}")
+
+# Get account summary
+account = client.portfolio.get_summary()
+print(f"Total Equity: ${account.total_equity:,.2f}")
+print(f"Cash: ${account.cash_balance:,.2f}")
+print(f"Day P&L: ${account.day_pnl:,.2f}")
+```
+
+### TypeScript / Node.js SDK
+
+```typescript
+import { VecTrade } from '@vectrade/sdk';
+
+// Initialize client
+const client = new VecTrade({ apiKey: 'vtrd_live_your_api_key_here' });
+
+// --- Market Data ---
+const quote = await client.market.getQuote({ symbol: 'AAPL' });
+console.log(`${quote.symbol}: $${quote.price} (${quote.changePercent}%)`);
+
+// Get key statistics
+const stats = await client.market.getStats({ symbol: 'NVDA' });
+console.log(`NVDA P/E: ${stats.peRatio}, Market Cap: $${stats.marketCap}`);
+
+// --- Trading ---
+// Place a bracket order
+const order = await client.trading.placeOrder({
+  symbol: 'AAPL',
+  exchange: 'NASDAQ',
+  side: 'BUY',
+  orderType: 'BRACKET',
+  quantity: 20,
+  takeProfitPrice: 200.00,
+  stopLossPrice: 175.00,
+  timeInForce: 'GTC',
+});
+console.log(`Bracket order ${order.orderId}: ${order.status}`);
+
+// --- Portfolio ---
+const positions = await client.portfolio.getPositions();
+positions.forEach((pos) => {
+  console.log(`${pos.symbol}: ${pos.quantity} @ $${pos.averageCost} → $${pos.currentPrice}`);
+});
+
+// Get performance metrics
+const metrics = await client.portfolio.getMetrics({ period: '1M' });
+console.log(`Monthly Return: ${metrics.totalReturn}%`);
+console.log(`Sharpe Ratio: ${metrics.sharpeRatio}`);
+```
+
+---
+
+## API Endpoint Reference (Summary)
+
+| Category | Endpoint | Method | Description |
+|----------|----------|--------|-------------|
+| Market | `/v1/market/quote` | GET | Real-time quote for a symbol |
+| Market | `/v1/market/history` | GET | Historical OHLCV data |
+| Market | `/v1/market/stats` | GET | Key statistics and ratios |
+| Market | `/v1/market/movers` | GET | Top gainers, losers, most active |
+| Market | `/v1/market/news` | GET | News articles with sentiment |
+| Trading | `/v1/trading/orders` | POST | Place a new order |
+| Trading | `/v1/trading/orders/{id}` | DELETE | Cancel a pending order |
+| Trading | `/v1/trading/orders` | GET | List all open orders |
+| Trading | `/v1/trading/orders/{id}` | GET | Get order status |
+| Portfolio | `/v1/portfolio/positions` | GET | All current positions |
+| Portfolio | `/v1/portfolio/history` | GET | Trade history with filters |
+| Portfolio | `/v1/portfolio/summary` | GET | Account summary metrics |
+| Portfolio | `/v1/portfolio/equity-curve` | GET | Historical portfolio values |
+| Alerts | `/v1/alerts` | POST | Create a price alert |
+| Alerts | `/v1/alerts` | GET | List active alerts |
+| Alerts | `/v1/alerts/{id}` | DELETE | Cancel an alert |
+
+<Tip>
+Complete API documentation with request/response schemas, error codes, WebSocket streaming endpoints, and pagination details is available at [api.vectrade.com/docs](https://api.vectrade.com/docs). The interactive API explorer allows you to test endpoints directly from the browser with your API key.
+</Tip>
+
+---
+
+## Webhook Integration (Coming Soon)
+
+VTrade will support outbound webhook notifications for real-time event delivery:
+- Order status changes (filled, cancelled, rejected)
+- Price alert triggers
+- Portfolio threshold alerts (drawdown, target return)
+- Competition status updates
+
+Webhooks will deliver JSON payloads to your configured HTTPS endpoint with HMAC signature verification for security.

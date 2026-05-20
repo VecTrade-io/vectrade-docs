@@ -1,0 +1,274 @@
+---
+title: VTrade Platform Guide
+description: A comprehensive user guide for VTrade — the institutional-grade paper trading simulator featuring multi-asset class coverage, AI-powered analytics, social trading, and gamified skill progression.
+---
+
+# Welcome to VTrade
+
+VTrade is a professional-grade paper trading simulator designed to replicate real-world market conditions with institutional accuracy. Whether you are a first-time investor learning the fundamentals of order execution, an intermediate trader refining risk management strategies, or an experienced professional backtesting new approaches, VTrade provides the tools, data, and community to accelerate your growth — all without risking real capital.
+
+<img src="/guides/vtrade/images/vectrade-vtrade-home.png" alt="VTrade Dashboard — Your central command center showing portfolio performance, active positions, and daily objectives" />
+
+---
+
+## Simulation Philosophy
+
+VTrade is built on the principle that **effective trading education requires realistic market conditions**. Unlike simplified stock games that execute instantly at quoted prices, VTrade models the frictions and complexities that impact real portfolio outcomes:
+
+| Simulation Feature | Behavior |
+|-------------------|----------|
+| **Price Execution** | Orders fill against live bid/ask with simulated slippage proportional to instrument liquidity and order size |
+| **Partial Fills** | Large orders relative to available liquidity fill incrementally across multiple price levels |
+| **Commission Fees** | Realistic fee schedules deducted from your virtual capital — every trade has a cost |
+| **Market Hours** | Orders respect exchange trading sessions; pre/after-hours available for US equities |
+| **Position Limits** | Maximum 25% single-position concentration and 2:1 margin — enforcing risk management discipline |
+| **Virtual Capital** | Starting balance of 1,000,000 VCR — sufficient to build diversified, multi-asset portfolios |
+
+This approach ensures that strategies developed on VTrade translate directly to live market execution — eliminating the false confidence that frictionless simulators create.
+
+---
+
+## Platform Capabilities
+
+<CardGroup cols={2}>
+  <Card title="Multi-Asset Trading Engine" icon="chart-line" href="/guides/vtrade/trading">
+    Execute market, limit, stop, and stop-limit orders across equities, ETFs, cryptocurrencies, foreign exchange, commodities, and indices. Orders process against live market data with configurable slippage simulation, realistic commission structures, and partial fill modeling.
+  </Card>
+  <Card title="Portfolio Intelligence" icon="briefcase" href="/guides/vtrade/portfolio">
+    Monitor real-time portfolio valuation, sector allocation, unrealized and realized P&L, position-level attribution, trade history with advanced filtering, equity curve visualization, and automated performance snapshots.
+  </Card>
+  <Card title="Comprehensive Market Data" icon="globe" href="/guides/vtrade/market-analytics">
+    Access 160+ tradable instruments across six asset classes. Research individual securities with 8 dedicated analysis tabs — including financials, options chains, insider ownership, SEC filings, and seasonal patterns.
+  </Card>
+  <Card title="AI-Powered Copilot" icon="robot" href="/guides/vtrade/copilot">
+    Interact with a conversational AI assistant equipped with 48 specialized tools for live data retrieval, technical and fundamental analysis, portfolio diagnostics, stock screening, and autonomous trade execution with user confirmation.
+  </Card>
+  <Card title="Social Trading & Competitions" icon="trophy" href="/guides/vtrade/social">
+    Participate in ranked leaderboards, join or create trading groups, enter time-limited competitions with varying rulesets, publish trade ideas, and build a public track record within the community.
+  </Card>
+  <Card title="Developer API Access" icon="code" href="/guides/vtrade/developer">
+    Generate API keys for programmatic access to market data, order execution, and portfolio management. Build automated strategies, custom dashboards, and integration workflows.
+  </Card>
+</CardGroup>
+
+---
+
+## Getting Started
+
+### Step 1 — Account Registration
+
+Navigate to [vectrade.io/register](https://vectrade.io/register) and complete the registration form. Upon account creation, your wallet is automatically credited with **1,000,000 VCR** (VecTrade Virtual Currency) — this is your starting capital for simulated trading.
+
+**Registration requires:**
+
+| Field | Requirements | Notes |
+|-------|-------------|-------|
+| Display Name | 3–20 characters | Your public identity across the platform |
+| Email | Valid, unique email address | Verified via confirmation link (check spam folder) |
+| Password | Min. 8 characters with complexity | Stored with bcrypt hashing; never transmitted in plaintext |
+
+**Post-Registration Account State:**
+- Wallet: 1,000,000 VCR available
+- Level: Rookie (Level 1)
+- Positions: None (empty portfolio)
+- Watchlists: 1 default empty watchlist created
+- Copilot: Active (free tier — 10 messages/day)
+
+### Step 2 — Explore the Platform
+
+After email verification and logging in, you land on the VTrade Dashboard. From here you can:
+
+1. **Explore the Market** — Browse available instruments across all asset classes
+2. **Configure Settings** — Set your preferred language, timezone, theme, and accent colour
+3. **Execute Your First Trade** — Head to the Trading Desk to place your first order
+
+### Step 3 — Market Familiarization
+
+<img src="/guides/vtrade/images/vectrade-vtrade-market-overview.png" alt="Market Overview — Live data across all asset classes with sector heatmap, top movers, and sentiment indicators" />
+
+Navigate to **Market** in the left sidebar to explore available instruments:
+
+| Asset Class | Coverage | Examples |
+|-------------|----------|----------|
+| **Equities** | 40+ stocks across 5 exchanges | AAPL (NASDAQ), BARC.L (LSE), 7203.T (TSE), 005930.KS (KOSDAQ) |
+| **ETFs** | 37 funds across 7 categories | SPY (Index), XLK (Sector), ARKK (Thematic), TLT (Fixed Income) |
+| **Crypto** | 23 tokens across 4 categories | BTC, ETH, SOL (Layer 1), UNI, AAVE (DeFi), DOGE (Meme) |
+| **Forex** | 21 currency pairs | EUR/USD, GBP/USD (Majors), EUR/GBP (Cross), USD/MXN (Emerging) |
+| **Commodities** | 20 futures contracts | Gold, Crude Oil (Energy), Copper (Industrial), Corn (Agricultural) |
+| **Indices** | 20 global benchmarks | S&P 500, NASDAQ, FTSE 100, DAX, Nikkei 225, Hang Seng |
+
+### Step 4 — Execute Your First Trade
+
+1. Open the **Trading Desk** from the sidebar
+2. Type a ticker symbol (e.g., `AAPL`) into the search field
+3. Review the live chart and current market price
+4. Click **Buy**, enter a quantity, and select **Market Order**
+5. Review the cost breakdown (estimated fill price + fees) in the preview panel
+6. Click **Submit Order** — your position is now live
+
+### Step 5 — Monitor and Iterate
+
+Return to your **Portfolio** to observe real-time P&L on your positions. Use the **Analytics** section to review risk metrics, and check the **Leaderboard** to see how your returns compare against the community.
+
+---
+
+## Dashboard Walkthrough
+
+<img src="/guides/vtrade/images/vectrade-vtrade-home.png" alt="VTrade Home Dashboard — Portfolio hero card, positions grid, activity feed, and missions sidebar" />
+
+The Dashboard is your primary interface upon login. It consolidates critical information across four zones:
+
+### Hero Section (Top)
+
+The full-width hero card presents your account summary:
+- **Total Portfolio Value** — Combined value of all open positions plus available cash, displayed as a large headline figure
+- **Daily P&L** — Today's profit or loss in both absolute (VCR) and percentage terms, with green/red color coding
+- **Trading Streak** — Consecutive days of trading activity (resets if you miss a day)
+- **Leaderboard Rank** — Your current global position (e.g., "#42 of 15,000 traders")
+- **Quick-Action Buttons** — One-click shortcuts to **Start Trading** and **View Feed**
+
+### Main Content Area (Center)
+
+- **Top Positions Grid** — Your 4–6 largest holdings displayed as cards, each showing symbol, current price, change %, sparkline chart (7-day price movement), and unrealized P&L
+- **Activity Feed** — A chronological stream combining your recent trades, order fills, badge unlocks, and posts from traders you follow. Each entry is timestamped and actionable (click to navigate)
+
+### Sidebar (Right)
+
+- **Account Metrics** — Cash balance, total unrealized P&L, number of open positions, today's net return %
+- **Daily Missions Panel** — 3–5 active challenges with progress bars showing completion percentage
+- **Discover People** — Algorithm-curated suggestions of traders to follow based on your style and performance
+- **Referral Card** — Your unique invite link with a counter showing successful referrals and earned bonuses
+
+### Navigation Bar (Left Sidebar)
+
+Persistent vertical navigation providing single-click access to all major sections:
+- Dashboard (Home)
+- Trading Desk
+- Portfolio
+- Market
+- Analytics
+- Copilot
+- Social (Feed, Groups, Leaderboard, Competitions, Messages)
+- Developer Portal
+- Settings
+
+---
+
+## Gamification & Progression System
+
+VTrade integrates a structured progression system designed to encourage consistent engagement, reward skill development, and provide measurable milestones for improvement.
+
+### Mission System
+
+<img src="/guides/vtrade/images/vectrade-vtrade-missions.png" alt="Daily and Weekly Missions — Progress bars, XP rewards, and completion status" />
+
+Missions are time-limited objectives that reset on a scheduled cadence:
+
+**Daily Missions** (reset at 00:00 UTC):
+- Execute a specified number of trades (e.g., "Place 3 trades today")
+- Research a security using the analytics tools (e.g., "View the financials tab for any stock")
+- Engage with the community (e.g., "Like or comment on 2 posts")
+- Use a specific feature (e.g., "Ask Copilot a question")
+
+**Weekly Missions** (reset Monday 00:00 UTC):
+- Achieve portfolio growth targets (e.g., "+5% portfolio return this week")
+- Diversification goals (e.g., "Hold positions in 3 different sectors")
+- Social engagement (e.g., "Publish a trade idea post")
+- Education milestones (e.g., "Complete 5 daily quizzes")
+
+**Rewards:** Each mission grants XP (experience points) and bonus VCR upon completion. Higher-difficulty missions yield proportionally greater rewards.
+
+### Knowledge Quiz
+
+<img src="/guides/vtrade/images/vectrade-vtrade-quiz.png" alt="Daily Quiz — Multiple-choice financial knowledge assessment" />
+
+A fresh quiz is available every 24 hours covering rotating topics:
+
+| Topic Category | Example Questions |
+|---------------|-------------------|
+| Technical Analysis | "What does a golden cross (50 SMA crossing above 200 SMA) typically signal?" |
+| Fundamental Analysis | "What does a P/E ratio below the sector average suggest?" |
+| Risk Management | "What is the maximum recommended position size per Kelly Criterion given a 60% win rate?" |
+| Market Mechanics | "What happens to a GTC limit order if the stock undergoes a 2:1 split?" |
+| Options Theory | "An increase in implied volatility benefits which option position: long straddle or short straddle?" |
+| Macroeconomics | "How does an inverted yield curve historically correlate with recession probability?" |
+
+Correct answers award XP. Streaks of consecutive correct answers trigger bonus multipliers.
+
+### Experience Levels & Progression
+
+As you accumulate XP through trading activity, missions, quizzes, and community participation, you advance through a tiered progression system:
+
+| Level Range | Title | Unlocks | XP Required |
+|-------------|-------|---------|-------------|
+| 1–5 | **Rookie** | Basic platform access | 0–500 |
+| 6–15 | **Trader** | Competition entry, group creation | 500–3,000 |
+| 16–30 | **Expert** | Extended analytics, custom screeners | 3,000–10,000 |
+| 31–50 | **Master** | Priority Copilot access, advanced order types | 10,000–30,000 |
+| 51+ | **Legend** | Exclusive competitions, profile frames, VCR multipliers | 30,000+ |
+
+Your level badge displays next to your name across all social surfaces (leaderboard, feed, groups, messages).
+
+### Achievement Badges
+
+Badges are permanent recognitions unlocked by reaching specific milestones:
+
+| Badge | Requirement | Rarity |
+|-------|-------------|--------|
+| **First Blood** | Execute your first trade | Common |
+| **Centurion** | Complete 100 trades | Uncommon |
+| **Diversified** | Hold positions across 5+ sectors simultaneously | Uncommon |
+| **Hot Streak** | 5 consecutive profitable trades (closed positions) | Rare |
+| **Diamond Hands** | Hold a single position for 30+ consecutive days | Rare |
+| **Whale** | Grow portfolio value to 2,000,000 VCR | Epic |
+| **Market Maker** | Execute 1,000+ lifetime trades | Epic |
+| **Triple Crown** | Win 1st place in 3 different competition types | Legendary |
+| **Untouchable** | Maintain a Sharpe Ratio above 2.0 for 90 consecutive days | Legendary |
+
+Badges are showcased on your public profile and appear as flair on leaderboard entries.
+
+---
+
+## Platform Navigation Reference
+
+| Objective | Navigation Path |
+|-----------|----------------|
+| Execute a trade | Sidebar → Trading Desk |
+| Review portfolio holdings | Sidebar → Portfolio |
+| Research a security | Sidebar → Market → click any ticker |
+| Run analytics | Sidebar → Analytics |
+| Chat with AI | Sidebar → Copilot |
+| View leaderboard | Sidebar → Social → Leaderboard |
+| Enter a competition | Sidebar → Social → Competitions |
+| Manage API keys | Sidebar → Developer |
+| Adjust settings | Sidebar → Settings (gear icon) |
+
+---
+
+## System Requirements & Compatibility
+
+VTrade is a web-based platform accessible from any modern browser. For optimal performance:
+
+| Requirement | Minimum | Recommended |
+|-------------|---------|-------------|
+| Browser | Chrome 90+, Firefox 88+, Safari 14+, Edge 90+ | Latest stable release |
+| Screen Resolution | 1280 × 720 | 1920 × 1080 or higher |
+| Internet | 1 Mbps stable connection | 10+ Mbps for real-time data |
+| JavaScript | Enabled (required) | — |
+| Cookies | Enabled (required for session) | — |
+
+Mobile responsive design supports tablets and smartphones, though the full trading desk experience is optimized for desktop viewports.
+
+---
+
+## Where to Go from Here
+
+| I want to... | Go to... |
+|--------------|----------|
+| Place my first trade or learn order types | [Trading Desk Guide](/guides/vtrade/trading) |
+| Understand my portfolio metrics and P&L | [Portfolio, Wallet & Watchlists](/guides/vtrade/portfolio) |
+| Research stocks, ETFs, crypto, or forex | [Market Data & Analytics](/guides/vtrade/market-analytics) |
+| Get AI-powered analysis and recommendations | [AI Copilot](/guides/vtrade/copilot) |
+| Compete on leaderboards or join groups | [Social & Community](/guides/vtrade/social) |
+| Build automations with the API | [Developer Portal](/guides/vtrade/developer) |
+| Configure account, appearance, or notifications | [Settings](/guides/vtrade/settings) |

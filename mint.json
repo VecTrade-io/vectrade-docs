@@ -72,6 +72,19 @@
       ]
     },
     {
+      "group": "VTrade",
+      "pages": [
+        "guides/vtrade/overview",
+        "guides/vtrade/trading",
+        "guides/vtrade/portfolio",
+        "guides/vtrade/market-analytics",
+        "guides/vtrade/copilot",
+        "guides/vtrade/social",
+        "guides/vtrade/developer",
+        "guides/vtrade/settings"
+      ]
+    },
+    {
       "group": "SDKs",
       "pages": [
         "sdks/python",
