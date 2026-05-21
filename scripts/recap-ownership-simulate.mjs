@@ -34,9 +34,12 @@ async function main() {
   if (await cookieBtn.isVisible({ timeout: 1000 }).catch(() => false)) { await cookieBtn.click(); await page.waitForTimeout(500); }
 
   // Wait for email input to appear
+  const email = process.env.VTRADE_EMAIL;
+  const password = process.env.VTRADE_PASSWORD;
+  if (!email || !password) { console.error('Set VTRADE_EMAIL and VTRADE_PASSWORD env vars'); process.exit(1); }
   await page.locator('input[type="email"]').waitFor({ state: 'visible', timeout: 10000 });
-  await page.locator('input[type="email"]').fill('***REDACTED***');
-  await page.locator('input[type="password"]').fill('***REDACTED***');
+  await page.locator('input[type="email"]').fill(email);
+  await page.locator('input[type="password"]').fill(password);
   await page.locator('form').locator('button[type="submit"]').click();
   try { await page.waitForURL(url => !url.toString().includes('/login'), { timeout: 15000 }); } catch {}
   await page.waitForTimeout(5000);

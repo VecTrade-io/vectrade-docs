@@ -1,12 +1,13 @@
-"""Seed data for VTrade screenshots — creates develop@vectrade.io user,
+"""Seed data for VTrade screenshots — creates a developer user,
 portfolio snapshots (performance calendar), feed posts with hashtags,
 and meaningful message conversations.
 
 Usage:
-    cd vectrade-core && python ../vectrade-docs/scripts/seed-screenshot-data.py
+    VTRADE_PASSWORD=xxx cd vectrade-core && python ../vectrade-docs/scripts/seed-screenshot-data.py
 """
 
 import asyncio
+import os
 import random
 import sys
 import uuid
@@ -27,9 +28,12 @@ engine = create_async_engine(DATABASE_URL, echo=False)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
 # ─── Constants ───
-DEVELOPER_EMAIL = "develop@vectrade.io"
+DEVELOPER_EMAIL = os.environ.get("VTRADE_EMAIL", "develop@vectrade.io")
 DEVELOPER_DISPLAY_NAME = "Vectrade Developer"
-DEVELOPER_PASSWORD = "***REDACTED***"
+DEVELOPER_PASSWORD = os.environ.get("VTRADE_PASSWORD", "")
+
+if not DEVELOPER_PASSWORD:
+    raise SystemExit("ERROR: Set VTRADE_PASSWORD env var")
 
 
 async def get_or_create_developer(db) -> uuid.UUID:
