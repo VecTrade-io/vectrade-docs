@@ -1,1 +1,27 @@
-* @VecTrade-io/sdk-team
+# ─── CODEOWNERS ─────────────────────────────────────────────────────────────
+# Maps file patterns to owners/agents responsible for review.
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ── Default: docs team ──────────────────────────────────────────────────────
+*                           @mountek
+
+# ── CI / DevOps ─────────────────────────────────────────────────────────────
+.github/workflows/          @mountek
+.github/dependabot.yml      @mountek
+
+# ── Documentation content (vt-docs-writer) ──────────────────────────────────
+*.mdx                       @mountek
+guides/                     @mountek
+api-reference/              @mountek
+sdks/                       @mountek
+resources/                  @mountek
+
+# ── API spec (vt-api-designer) ──────────────────────────────────────────────
+openapi/                    @mountek
+
+# ── Site config (vt-docs-writer) ────────────────────────────────────────────
+mint.json                   @mountek
+package.json                @mountek
+
+# ── Scripts (vt-devops) ─────────────────────────────────────────────────────
+scripts/                    @mountek
