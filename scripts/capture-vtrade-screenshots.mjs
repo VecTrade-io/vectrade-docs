@@ -9,8 +9,8 @@ import { parseArgs } from 'util';
 const { values: args } = parseArgs({
   options: {
     url:      { type: 'string', default: process.env.VTRADE_URL      || 'https://uat.vectrade.io' },
-    email:    { type: 'string', default: process.env.VTRADE_EMAIL    || 'develop@vectrade.io' },
-    password: { type: 'string', default: process.env.VTRADE_PASSWORD || '***REDACTED***' },
+    email:    { type: 'string', default: process.env.VTRADE_EMAIL    || '' },
+    password: { type: 'string', default: process.env.VTRADE_PASSWORD || '' },
     output:   { type: 'string', default: process.env.VTRADE_OUTPUT   || '' },
   },
   strict: false,
@@ -22,6 +22,11 @@ const PASSWORD    = args.password;
 const OUTPUT_DIR  = args.output
   ? resolve(args.output)
   : resolve(import.meta.dirname, '../guides/vtrade/images');
+
+if (!EMAIL || !PASSWORD) {
+  console.error('ERROR: VTRADE_EMAIL and VTRADE_PASSWORD env vars are required (or pass --email / --password)');
+  process.exit(1);
+}
 
 console.log(`Config: url=${BASE_URL} email=${EMAIL} output=${OUTPUT_DIR}\n`);
 mkdirSync(OUTPUT_DIR, { recursive: true });
