@@ -17,8 +17,18 @@ Thumbs.db
 *.bak
 *.swp
 
-# Debug/scratch scripts
+# Scripts (keep only check-links.mjs for CI)
+scripts/capture-*.mjs
 scripts/debug-*.mjs
+scripts/recap-*.mjs
+scripts/seed-*.py
 
 # Build output
 .mintlify/
+
+# IDE
+.vscode/
+.idea/
+
+# Package manager
+package-lock.json
