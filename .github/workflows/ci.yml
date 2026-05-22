@@ -2,9 +2,10 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix/**]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -26,20 +27,48 @@ jobs:
       - name: Check for broken internal links
         run: npm run check-links
 
-      - name: Validate frontmatter
-        run: |
-          for f in $(find . -name "*.mdx" -not -path "./node_modules/*"); do
-            if ! head -1 "$f" | grep -q "^---"; then
-              echo "ERROR: $f missing frontmatter"
-              exit 1
-            fi
-          done
-          echo "All MDX files have frontmatter"
+  test:
+    name: Run Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.11", "3.12"]
+        exclude:
+          - os: macos-latest
+            python-version: "3.11"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install test dependencies
+        run: pip install pytest pytest-cov
+
+      - name: Run validation tests
+        run: python -m pytest tests/ -v --tb=short
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Check for hardcoded secrets
         run: |
-          if grep -rn 'vq_live_[a-zA-Z0-9]\{10,\}' --include="*.mdx" .; then
+          if grep -rn 'vq_live_[a-zA-Z0-9]\{10,\}' --include="*.mdx" --include="*.md" .; then
             echo "ERROR: Found hardcoded live API keys!"
             exit 1
           fi
           echo "No hardcoded secrets found"
+
+      - name: Check for hardcoded passwords
+        run: |
+          if grep -rn 'password\s*[:=]\s*['"'"'"]\S\{8,\}' --include="*.mdx" .; then
+            echo "ERROR: Found hardcoded passwords!"
+            exit 1
+          fi
+          echo "No hardcoded passwords found"

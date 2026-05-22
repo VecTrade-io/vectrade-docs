@@ -32,3 +32,4 @@ scripts/seed-*.py
 
 # Package manager
 package-lock.json
+tests/__pycache__/
