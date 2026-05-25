@@ -51,6 +51,43 @@ Copy the appropriate config for your IDE from the [configs directory](https://gi
 | Cline | `configs/cline.json` |
 | Continue.dev | `configs/continue-dev.json` |
 
+### Hosted (Remote) — Zero Install
+
+Connect directly to VecTrade's hosted MCP server without installing anything locally.
+
+<CodeGroup>
+```json Streamable HTTP (recommended)
+{
+  "mcpServers": {
+    "vectrade": {
+      "url": "https://mcp.vectrade.io/mcp",
+      "headers": {
+        "X-API-Key": "vq_live_YOUR_KEY"
+      }
+    }
+  }
+}
+```
+
+```json Legacy SSE
+{
+  "mcpServers": {
+    "vectrade": {
+      "url": "https://mcp.vectrade.io/sse",
+      "headers": {
+        "X-API-Key": "vq_live_YOUR_KEY"
+      }
+    }
+  }
+}
+```
+</CodeGroup>
+
+<Note>
+The hosted server uses the same API key authentication and plan limits as the REST API.
+AI tools require a Standard or Professional plan.
+</Note>
+
 ## Available Tools
 
 ### Quotes & Market Data
@@ -135,4 +172,4 @@ docker compose up -d
 
 - [GitHub Repository](https://github.com/VecTrade-io/vectrade-mcp)
 - [Full Tools Reference](https://github.com/VecTrade-io/vectrade-mcp/blob/main/TOOLS.md)
-- [Get API Key](https://app.vectrade.io/keys)
+- [Get API Key](https://vectrade.io/vtrade/developer)
