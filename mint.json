@@ -225,11 +225,5 @@
       "github": "https://github.com/VecTrade-io",
       "x": "https://x.com/vectrade"
     }
-  },
-  "integrations": {
-    "umami": {
-      "websiteId": "af55f298-b98d-4e1f-953f-0a52a2d48478",
-      "src": "https://analytics.vectrade.io/script.js"
-    }
   }
 }
