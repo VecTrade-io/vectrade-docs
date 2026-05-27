@@ -33,20 +33,26 @@ console.log(result.text);
 
 ## Available Tools
 
-The provider exposes all VecTrade API endpoints as AI-callable tools:
+The provider exposes 16 VecTrade API endpoints as AI-callable tools:
 
 | Tool | Description |
 |------|-------------|
 | `getQuote` | Get real-time quote for a symbol |
 | `getBatchQuotes` | Get quotes for multiple symbols |
 | `getFundamentals` | Company fundamentals and ratios |
-| `getTechnicals` | Technical indicators |
-| `analyzeAI` | VecTrade AI financial analysis |
+| `getFinancialStatements` | Income, balance sheet, cash flow statements |
+| `getCompanyProfile` | Company info, sector, industry, exchange |
+| `getTechnicals` | Technical indicators and scoring |
+| `getNews` | Latest market news for a symbol |
+| `getSentiment` | Social & news sentiment scoring |
+| `getAnalystRatings` | Analyst consensus ratings |
+| `getAnalystTargets` | Analyst price targets (high/low/mean) |
+| `getUpgradesDowngrades` | Recent analyst rating changes |
+| `getEarnings` | Historical earnings data |
+| `getInsiderTransactions` | Insider trading activity |
 | `getOptionsChain` | Options chain with Greeks |
-| `getAnalystConsensus` | Analyst consensus ratings |
-| `getEarningsHistory` | Historical earnings data |
-| `listNews` | Latest market news |
-| `runScreener` | Stock screening with filters |
+| `getHistoricalPrices` | OHLCV price history |
+| `getETF` | ETF profile, NAV, and holdings |
 
 ## Configuration
 

@@ -5,34 +5,47 @@ description: How to authenticate with the VecTrade API and manage API keys secur
 
 # Authentication
 
-All VecTrade API requests require authentication via Bearer token.
+All VecTrade API requests require authentication via the `X-API-Key` header.
 
-## API Key Types
+## API Key Format
 
-| Key Prefix | Environment | Use Case |
-|-----------|-------------|----------|
-| `vq_live_` | Production | Real-time data, production apps |
-| `vq_test_` | Sandbox | Development, testing, CI |
+API keys follow the format `vq_` followed by a random string:
 
-## Setting Your API Key
-
-### Environment Variable (Recommended)
-
-```bash
-export VECTRADE_API_KEY="vq_live_your_key_here"
+```
+X-API-Key: vq_aaJFCQFZpv8BZU_RuLLAHlXP_Md3A55GhNeVtnn3Ykk
 ```
 
-The SDK automatically reads `VECTRADE_API_KEY`:
+## Making Authenticated Requests
+
+### cURL
+
+```bash
+curl -H "X-API-Key: $VECTRADE_API_KEY" \
+  https://api.vectrade.io/v1/vq/quotes/AAPL
+```
+
+### Python SDK
 
 ```python
 from vectrade import VecTrade
-client = VecTrade()  # reads from environment
+
+# Reads VECTRADE_API_KEY from environment automatically
+client = VecTrade()
+
+# Or pass explicitly
+client = VecTrade(api_key="vq_your_key_here")
 ```
 
-### Explicit Configuration
+### TypeScript SDK
 
-```python
-client = VecTrade(api_key="vq_live_your_key_here")
+```typescript
+import { VecTrade } from "@vectrade/sdk";
+
+// Reads VECTRADE_API_KEY from environment
+const client = new VecTrade();
+
+// Or pass explicitly
+const client = new VecTrade({ apiKey: "vq_your_key_here" });
 ```
 
 <Warning>
@@ -52,13 +65,15 @@ Never hardcode API keys in source code. Use environment variables or secret mana
 | Scope | Access |
 |-------|--------|
 | `quotes:read` | Real-time and historical quotes |
-| `fundamentals:read` | Company financials and profiles |
-| `technicals:read` | Technical indicators and candles |
+| `fundamentals:read` | Company financials, profiles, and statements |
+| `technicals:read` | Technical indicators and scoring |
 | `news:read` | Financial news articles |
-| `screener:read` | Stock screener |
-| `ai:read` | AI analysis (streaming) |
-| `webhooks:write` | Create/delete webhooks |
+| `analyst:read` | Analyst consensus, price targets, ratings |
+| `earnings:read` | Earnings history and calendar |
+| `insider:read` | Insider trading activity |
 | `options:read` | Options chain data |
+| `sentiment:read` | Market sentiment data |
+| `etf:read` | ETF profiles and holdings |
 
 ## Error Responses
 

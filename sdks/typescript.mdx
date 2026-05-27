@@ -42,69 +42,64 @@ import { VecTrade } from "@vectrade/sdk";
 const client = new VecTrade(); // reads VECTRADE_API_KEY env var
 
 const quote = await client.quotes.get("AAPL");
-console.log(`${quote.symbol}: $${quote.price}`);
+console.log(`${quote.ticker}: $${quote.price}`);
 ```
 
 ## Configuration
 
 ```typescript
 const client = new VecTrade({
-  apiKey: "vq_live_...",   // or VECTRADE_API_KEY env var
+  apiKey: "vq_...",        // or VECTRADE_API_KEY env var
   baseURL: "https://...",  // custom endpoint
   timeout: 30000,          // request timeout (ms)
   maxRetries: 2,           // automatic retries on 429/5xx
-  sandbox: true,           // use sandbox environment
 });
 ```
 
 ## Resources
 
-All 11 API resource groups are available:
+All 12 resource groups available:
 
 | Resource | Methods |
 |----------|---------|
 | `client.quotes` | `get(symbol)`, `batch(symbols)` |
-| `client.fundamentals` | `get(symbol)`, `incomeStatement(symbol)`, `balanceSheet(symbol)` |
-| `client.technicals` | `get(symbol, options)` |
-| `client.news` | `list(options)`, `get(id)` |
-| `client.screener` | `screen(filters)` |
-| `client.ai` | `analyze(prompt)` — supports streaming |
-| `client.options` | `chain(symbol, options)`, `expirations(symbol)` |
+| `client.fundamentals` | `get(symbol)`, `statements(symbol)` |
+| `client.technicals` | `get(symbol)` |
+| `client.news` | `list(symbol)` |
+| `client.options` | `chain(symbol)` |
 | `client.analyst` | `consensus(symbol)`, `priceTargets(symbol)`, `ratings(symbol)` |
-| `client.earnings` | `history(symbol)`, `calendar()` |
-| `client.insider` | `transactions(symbol)`, `summary(symbol)` |
-| `client.webhooks` | `create(url, events)`, `list()`, `delete(id)` |
+| `client.earnings` | `history(symbol)` |
+| `client.insider` | `transactions(symbol)` |
+| `client.profile` | `get(symbol)` |
+| `client.sentiment` | `get(symbol)` |
+| `client.historical` | `get(symbol, { period })` |
+| `client.etf` | `get(symbol)` |
 
-## Streaming
+## Usage Examples
+
+### Batch Quotes
 
 ```typescript
-const stream = await client.ai.analyze("Analyze AAPL", { stream: true });
-
-for await (const chunk of stream) {
-  process.stdout.write(chunk.content);
+const quotes = await client.quotes.batch(["AAPL", "MSFT", "GOOGL"]);
+for (const q of quotes) {
+  console.log(`${q.ticker}: $${q.price.toFixed(2)} (${q.change_percent}%)`);
 }
 ```
 
-## Pagination
+### Technical Analysis
 
 ```typescript
-const paginator = client.news.list({ limit: 100 });
-
-for await (const article of paginator) {
-  console.log(article.title);
-}
-
-// Or collect all at once
-const all = await paginator.toArray();
+const tech = await client.technicals.get("AAPL");
+console.log(`Score: ${tech.technical_score}/100`);
+console.log(`RSI: ${tech.indicators?.rsi?.value} (${tech.indicators?.rsi?.signal})`);
+console.log(`Trend: ${tech.summary?.trend}`);
 ```
 
-## Webhook Verification
+### Analyst Consensus
 
 ```typescript
-import { verifyWebhook } from "@vectrade/sdk";
-
-const event = await verifyWebhook(rawBody, headers, secret);
-// Validates HMAC-SHA256 signature + timestamp (replay protection)
+const analyst = await client.analyst.consensus("AAPL");
+console.log(`${analyst.consensus} | Signal: ${analyst.signal}`);
 ```
 
 ## Error Handling

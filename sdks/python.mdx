@@ -52,51 +52,55 @@ client = VecTrade(
 
 ## Resources
 
-All 11 API resource groups are available:
+All 12 resource groups available:
 
 | Resource | Methods |
 |----------|---------|
 | `client.quotes` | `get(symbol)`, `batch(symbols)` |
-| `client.fundamentals` | `get(symbol)`, `income_statement(symbol)`, `balance_sheet(symbol)` |
-| `client.technicals` | `get(symbol, indicators, interval)` |
-| `client.news` | `list(symbols, limit)`, `get(id)` |
-| `client.screener` | `screen(filters, limit)` |
-| `client.ai` | `analyze(prompt)` — supports streaming |
-| `client.options` | `chain(symbol, expiration)`, `expirations(symbol)` |
+| `client.fundamentals` | `get(symbol)`, `statements(symbol)` |
+| `client.technicals` | `get(symbol)` |
+| `client.news` | `list(symbol)` |
+| `client.options` | `chain(symbol)` |
 | `client.analyst` | `consensus(symbol)`, `price_targets(symbol)`, `ratings(symbol)` |
-| `client.earnings` | `history(symbol)`, `calendar()` |
-| `client.insider` | `transactions(symbol)`, `summary(symbol)` |
-| `client.webhooks` | `create(url, events)`, `list()`, `delete(id)` |
+| `client.earnings` | `history(symbol)` |
+| `client.insider` | `transactions(symbol)` |
+| `client.profile` | `get(symbol)` |
+| `client.sentiment` | `get(symbol)` |
+| `client.historical` | `get(symbol, period="5d")` |
+| `client.etf` | `get(symbol)` |
 
-## Streaming
+## Usage Examples
+
+### Real-Time Quote
 
 ```python
-for chunk in client.ai.analyze("Analyze AAPL", stream=True):
-    print(chunk.content, end="")
+quote = client.quotes.get("AAPL")
+print(f"{quote.symbol}: ${quote.price:.2f} ({quote.change_pct:+.2f}%)")
 ```
 
-## Pagination
+### Batch Quotes
 
 ```python
-for article in client.news.list(limit=100):
-    print(article.title)
-# Automatically fetches next pages
+quotes = client.quotes.batch(["AAPL", "MSFT", "GOOGL"])
+for q in quotes:
+    print(f"{q.symbol}: ${q.price:.2f}")
 ```
 
-## Middleware
+### Technical Analysis
 
 ```python
-from vectrade.telemetry import OpenTelemetryMiddleware
-
-client = VecTrade(middleware=[OpenTelemetryMiddleware()])
+tech = client.technicals.get("AAPL")
+print(f"Score: {tech.technical_score}/100")
+print(f"RSI: {tech.indicators['rsi']['value']:.1f} ({tech.indicators['rsi']['signal']})")
+print(f"Trend: {tech.summary['trend']}")
 ```
 
-## Webhooks
+### Analyst Consensus
 
 ```python
-from vectrade import Webhooks
-
-event = Webhooks.verify(payload, headers, secret)
+analyst = client.analyst.consensus("AAPL")
+print(f"Rating: {analyst.consensus} | Signal: {analyst.signal}")
+print(f"Analysts: {analyst.total_analysts}")
 ```
 
 ## Error Handling

@@ -5,77 +5,50 @@ description: "Use VecTrade financial tools in Claude Desktop, Cursor, VS Code, a
 
 ## Overview
 
-The VecTrade MCP Integration Kit provides **27 financial tools** to any AI IDE that supports the [Model Context Protocol](https://modelcontextprotocol.io/).
+The VecTrade MCP server provides **16 financial data tools** to any AI IDE that supports the [Model Context Protocol](https://modelcontextprotocol.io/).
 
 Supported clients: Claude Desktop, Cursor, VS Code Copilot, Windsurf, Cline, Continue.dev.
 
-## Installation
-
-```bash
-pip install vectrade-mcp
-```
-
 ## Quick Setup
 
-### Interactive Wizard
+### Option 1: Hosted (recommended — zero install)
 
-```bash
-python -m vectrade_mcp.setup_wizard
-```
-
-The wizard will:
-1. Detect your installed IDE clients
-2. Ask for your VecTrade API key
-3. Write the correct config file automatically
-
-### CLI Auto-Setup
-
-If you have the [VecTrade CLI](/sdks/cli) installed:
-
-```bash
-vectrade mcp setup cursor
-vectrade mcp setup claude
-vectrade mcp setup vscode
-```
-
-### Manual Configuration
-
-Copy the appropriate config for your IDE from the [configs directory](https://github.com/VecTrade-io/vectrade-mcp/tree/main/configs).
-
-| IDE | Config File |
-|-----|-------------|
-| Claude Desktop | `configs/claude-desktop.json` |
-| Cursor | `configs/cursor.json` |
-| VS Code (Copilot) | `configs/vscode.json` |
-| Windsurf | `configs/windsurf.json` |
-| Cline | `configs/cline.json` |
-| Continue.dev | `configs/continue-dev.json` |
-
-### Hosted (Remote) — Zero Install
-
-Connect directly to VecTrade's hosted MCP server without installing anything locally.
+Add this to your IDE's MCP configuration:
 
 <CodeGroup>
-```json Streamable HTTP (recommended)
+```json Claude Desktop (~/.config/claude/claude_desktop_config.json)
 {
   "mcpServers": {
     "vectrade": {
-      "url": "https://mcp.vectrade.io/mcp",
+      "url": "https://mcp.vectrade.io/sse",
       "headers": {
-        "X-API-Key": "vq_live_YOUR_KEY"
+        "X-API-Key": "vq_your_key_here"
       }
     }
   }
 }
 ```
 
-```json Legacy SSE
+```json Cursor (.cursor/mcp.json)
 {
   "mcpServers": {
     "vectrade": {
       "url": "https://mcp.vectrade.io/sse",
       "headers": {
-        "X-API-Key": "vq_live_YOUR_KEY"
+        "X-API-Key": "vq_your_key_here"
+      }
+    }
+  }
+}
+```
+
+```json VS Code (.vscode/mcp.json)
+{
+  "servers": {
+    "vectrade": {
+      "url": "https://mcp.vectrade.io/sse",
+      "headers": {
+        "X-API-Key": "vq_your_key_here"
       }
     }
   }
@@ -83,93 +56,107 @@ Connect directly to VecTrade's hosted MCP server without installing anything loc
 ```
 </CodeGroup>
 
-<Note>
-The hosted server uses the same API key authentication and plan limits as the REST API.
-AI tools require a Standard or Professional plan.
-</Note>
+### Option 2: Local (stdio via npx)
 
-## Available Tools
+```json
+{
+  "mcpServers": {
+    "vectrade": {
+      "command": "npx",
+      "args": ["-y", "@vectrade/mcp-server"],
+      "env": {
+        "VECTRADE_API_KEY": "vq_your_key_here"
+      }
+    }
+  }
+}
+```
+
+### CLI Auto-Setup
+
+If you have the [VecTrade CLI](/sdks/cli):
+
+```bash
+vectrade mcp setup cursor
+vectrade mcp setup claude
+vectrade mcp setup vscode
+```
+
+## Available Tools (16)
 
 ### Quotes & Market Data
 
 | Tool | Description |
 |------|-------------|
-| `get_quote` | Real-time stock quote |
-| `get_batch_quotes` | Multiple quotes in one call |
-| `get_historical_prices` | Historical OHLCV data |
-| `get_market_movers` | Top gainers/losers/active |
-| `get_market_status` | Market open/close status |
+| `get_quote` | Real-time stock quote (price, change, volume) |
+| `get_batch_quotes` | Multiple quotes in one call (up to 50) |
+| `get_historical_prices` | Historical OHLCV data (5d, 1mo, 3mo, 6mo, 1y, 5y) |
 
 ### Fundamentals
 
 | Tool | Description |
 |------|-------------|
-| `get_fundamentals` | Company financial data |
-| `get_income_statement` | Revenue, earnings, margins |
-| `get_balance_sheet` | Assets, liabilities, equity |
-| `get_cash_flow` | Operating/investing/financing |
-| `get_company_profile` | Company info and description |
+| `get_fundamentals` | Key financial metrics (market cap, SMAs) |
+| `get_financial_statements` | Income statement, balance sheet, cash flow |
+| `get_company_profile` | Company info, sector, industry, description |
 
 ### Technical Analysis
 
 | Tool | Description |
 |------|-------------|
-| `get_technicals` | Technical indicators (RSI, MACD, etc.) |
-| `get_support_resistance` | Key price levels |
-| `get_chart_patterns` | Detected chart patterns |
+| `get_technicals` | Technical score, RSI, MACD, Bollinger, support/resistance |
 
 ### News & Sentiment
 
 | Tool | Description |
 |------|-------------|
-| `get_news` | Latest financial news |
-| `get_sentiment` | Aggregated sentiment score |
-| `get_analyst_ratings` | Analyst consensus and targets |
+| `get_news` | Latest financial news for a symbol |
+| `get_sentiment` | Sentiment score, social mentions (Twitter, Reddit) |
 
-### Screening & Discovery
-
-| Tool | Description |
-|------|-------------|
-| `run_screener` | Stock screening with filters |
-| `get_sector_performance` | Sector returns and rotation |
-| `get_similar_stocks` | Find similar companies |
-
-### AI Analysis
+### Analyst
 
 | Tool | Description |
 |------|-------------|
-| `analyze_stock` | AI-powered stock analysis |
-| `compare_stocks` | Side-by-side AI comparison |
-| `explain_movement` | Explain price movement |
+| `get_analyst_ratings` | Analyst consensus rating (Buy/Hold/Sell) |
+| `get_analyst_targets` | Price target estimates (high, low, mean, median) |
+| `get_upgrades_downgrades` | Recent analyst rating changes |
 
-### Portfolio & Watchlist
+### Earnings & Insider
 
 | Tool | Description |
 |------|-------------|
-| `get_portfolio_summary` | Portfolio overview |
-| `get_watchlist` | Current watchlist |
-| `add_to_watchlist` | Add symbol to watchlist |
-| `get_alerts` | Active price alerts |
+| `get_earnings` | Earnings history with EPS actual vs estimate |
+| `get_insider_transactions` | Insider buy/sell transactions |
+
+### Options & ETF
+
+| Tool | Description |
+|------|-------------|
+| `get_options_chain` | Full options chain (calls & puts) |
+| `get_etf` | ETF info, holdings, sector weights, performance |
+
+## Example Usage
+
+Once configured, ask your AI assistant:
+
+- "What's Apple's current stock price?"
+- "Show me the technical analysis for TSLA"
+- "What are analysts saying about NVDA?"
+- "Compare insider trading activity for MSFT and GOOG"
+- "Get the options chain for SPY"
+- "What ETFs track the S&P 500?"
+- "Show me AAPL's historical prices for the past month"
 
 ## Verification
 
-After setup, verify your configuration:
+Test the connection by asking your AI assistant to call any tool:
 
-```bash
-python -m vectrade_mcp.verify
-```
+> "Use the get_quote tool to get the price of AAPL"
 
-## Docker
-
-For isolated deployment:
-
-```bash
-cd docker/
-docker compose up -d
-```
+If authentication fails, verify your API key is correct and active at [vectrade.io/vtrade/developer](https://vectrade.io/vtrade/developer).
 
 ## Links
 
 - [GitHub Repository](https://github.com/VecTrade-io/vectrade-mcp)
-- [Full Tools Reference](https://github.com/VecTrade-io/vectrade-mcp/blob/main/TOOLS.md)
+- [Examples](https://github.com/VecTrade-io/vectrade-examples)
 - [Get API Key](https://vectrade.io/vtrade/developer)

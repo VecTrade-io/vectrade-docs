@@ -5,6 +5,10 @@ description: Complete guide to VTrade's conversational AI trading assistant — 
 
 # AI Copilot
 
+<Info>
+**Plan Requirement:** AI Copilot is available on the **Standard** ($19/mo) and **Professional** ($49/mo) plans. Free plan users will see an upgrade prompt when accessing the Copilot page.
+</Info>
+
 VTrade Copilot is an AI-powered conversational trading assistant that combines large language model reasoning with real-time market data access. It functions as your personal research analyst, portfolio manager, and trading desk — accessible through a natural language chat interface.
 
 Copilot has access to 59 specialized tools spanning market data retrieval, fundamental analysis, technical analysis, portfolio diagnostics, stock screening, and autonomous order execution. You interact in plain language; Copilot determines which tools to invoke, retrieves the necessary data, synthesizes the results, and delivers actionable intelligence.
@@ -31,7 +35,7 @@ Navigate to **VTrade → Copilot** from the left sidebar.
 | **Conversation History** | Chronological list of all past sessions (auto-titled from first message) |
 | **Search Bar** | Full-text search across all conversation history (appears with 3+ conversations) |
 | **Recent Recommendations** | Quick-access cards for the most recent trade recommendations generated |
-| **Usage Quota** | Circular progress indicator showing remaining daily prompt allowance |
+| **Usage Quota** | Circular progress indicator showing remaining monthly token allowance (Standard+ plans) |
 | **Catalysts** | Shortcut to the upcoming catalysts tracker |
 | **Thesis Manager** | Shortcut to investment thesis documents |
 
@@ -365,20 +369,24 @@ Starting a **New Chat** creates a clean context — use this when switching to a
 
 ## Usage Quotas & Rate Limits
 
-Your subscription plan determines daily Copilot usage:
+Your subscription plan determines Copilot access:
 
-| Plan | Daily Message Limit | Token Budget | Priority |
-|------|--------------------:|-------------:|----------|
-| **Free** | 10 messages | Standard | Normal queue |
-| **Pro** | 50 messages | Extended | Priority queue |
-| **Premium** | Unlimited | Maximum | Dedicated capacity |
+| Plan | AI Access | Token Budget | Priority |
+|------|-----------|-------------|----------|
+| **Free** | Not available | — | — |
+| **Standard** ($19/mo) | Unlimited prompts | 1M tokens/month | Normal queue |
+| **Professional** ($49/mo) | Unlimited prompts | 5M tokens/month | Priority queue |
 
-**Quota Indicators:**
-- **Quota Ring** (sidebar) — Circular progress indicator showing % consumed
+<Warning>
+**Free plan users do not have access to AI Copilot.** The Copilot page will display an upgrade prompt. Upgrade to Standard or Professional to unlock AI-powered analysis.
+</Warning>
+
+**Quota Indicators (Standard & Professional):**
+- **Quota Ring** (sidebar) — Circular progress indicator showing % of monthly token budget consumed
 - **Color States:** Green (> 50% remaining) → Amber (10–50% remaining) → Red (< 10% remaining)
-- **Exhausted State:** Input bar disables with message: "Daily limit reached. Resets at 00:00 UTC or upgrade for more."
+- **Exhausted State:** Input bar disables with message: "Monthly token allowance exhausted. Resets on the 1st of next month."
 
-**Reset Schedule:** Quotas reset daily at midnight UTC.
+**Reset Schedule:** Token budgets reset on the 1st of each month at midnight UTC.
 
 ---
 

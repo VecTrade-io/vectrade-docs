@@ -12,7 +12,7 @@ Sign up at [vectrade.io](https://vectrade.io/register) and copy your API key fro
 Set it as an environment variable:
 
 ```bash
-export VECTRADE_API_KEY="vq_live_your_key_here"
+export VECTRADE_API_KEY="vq_your_key_here"
 ```
 
 ## 2. Install the SDK
@@ -54,66 +54,54 @@ import { VecTrade } from '@vectrade/sdk';
 const client = new VecTrade();
 const quote = await client.quotes.get('AAPL');
 
-console.log(`Symbol: ${quote.symbol}`);
+console.log(`Symbol: ${quote.ticker}`);
 console.log(`Price:  $${quote.price.toFixed(2)}`);
-console.log(`Change: ${quote.changePct > 0 ? '+' : ''}${quote.changePct}%`);
+console.log(`Change: ${quote.change_percent > 0 ? '+' : ''}${quote.change_percent.toFixed(2)}%`);
 console.log(`Volume: ${quote.volume.toLocaleString()}`);
 ```
 
 ```bash cURL
-curl -H "Authorization: Bearer $VECTRADE_API_KEY" \
-  https://api.vectrade.io/v1/quotes/AAPL
+curl -H "X-API-Key: $VECTRADE_API_KEY" \
+  https://api.vectrade.io/v1/vq/quotes/AAPL
 ```
 </CodeGroup>
 
-## 4. Try AI Analysis
+## 4. Technical Analysis & More
 
 <CodeGroup>
 ```python Python
-# Streaming AI analysis
-for chunk in client.ai.stream("Analyze AAPL earnings trend"):
-    print(chunk.text, end="", flush=True)
+# Technical indicators
+tech = client.technicals.get("AAPL")
+print(f"Technical Score: {tech.technical_score}/100")
+print(f"RSI: {tech.indicators['rsi']['value']:.1f} ({tech.indicators['rsi']['signal']})")
+print(f"Trend: {tech.summary['trend']}")
+
+# Analyst consensus
+analyst = client.analyst.consensus("AAPL")
+print(f"Rating: {analyst.consensus} (Signal: {analyst.signal})")
 ```
 
 ```typescript TypeScript
-// Streaming AI analysis
-const stream = client.ai.stream('Analyze AAPL earnings trend');
-for await (const chunk of stream) {
-  process.stdout.write(chunk.content);
-}
+// Technical indicators
+const tech = await client.technicals.get('AAPL');
+console.log(`Technical Score: ${tech.technical_score}/100`);
+console.log(`Trend: ${tech.summary?.trend}`);
+
+// Analyst consensus
+const analyst = await client.analyst.consensus('AAPL');
+console.log(`Rating: ${analyst.consensus} | Signal: ${analyst.signal}`);
 ```
 
-```bash CLI
-vectrade ai "Analyze AAPL earnings trend"
-```
-</CodeGroup>
-
-## 5. Use the Sandbox
-
-For development and testing, use the sandbox environment with free unlimited requests:
-
-<CodeGroup>
-```python Python
-client = VecTrade(sandbox=True)
-```
-
-```typescript TypeScript
-const client = new VecTrade({ sandbox: true });
-```
-
-```bash Environment
-export VECTRADE_SANDBOX=true
+```bash cURL
+curl -H "X-API-Key: $VECTRADE_API_KEY" \
+  https://api.vectrade.io/v1/vq/technical/AAPL
 ```
 </CodeGroup>
 
-<Note>
-Sandbox data is delayed and simulated. Use production keys for real-time data.
-</Note>
+## 5. Next Steps
 
-## Next Steps
-
-- [Authentication Guide](/guides/authentication) — API key management and security
-- [Error Handling](/guides/error-handling) — Retry logic and error codes
-- [Rate Limits](/guides/rate-limits) — Quotas and optimization
-- [Streaming](/guides/streaming) — Real-time data with SSE
-- [Webhooks](/guides/webhooks) — Event-driven architecture
+- [Python SDK](/sdks/python) — Full Python reference
+- [TypeScript SDK](/sdks/typescript) — Full TypeScript/Node.js reference
+- [MCP Server](/sdks/mcp) — AI agent integration with 16 tools
+- [Authentication Guide](/guides/authentication) — API key management
+- [Examples](https://github.com/VecTrade-io/vectrade-examples) — Full working examples

@@ -24,7 +24,7 @@ VecTrade provides institutional-grade financial data through a modern API design
     Power financial AI agents with structured data and streaming analysis via MCP or Vercel AI SDK.
   </Card>
   <Card title="Screening Tools" icon="filter">
-    Build custom screeners with 50+ filters and real-time webhook alerts.
+    Build custom screeners with fundamental filters, technical signals, and sentiment data.
   </Card>
 </CardGroup>
 
@@ -32,14 +32,14 @@ VecTrade provides institutional-grade financial data through a modern API design
 
 | Feature | Details |
 |---------|---------|
-| **Endpoints** | 27 REST endpoints across 12 resource groups |
+| **Endpoints** | 16 REST endpoints across 12 resource groups |
 | **Coverage** | 100K+ global instruments (equities, ETFs, indices) |
 | **Latency** | Sub-100ms p95 response time |
-| **Streaming** | Server-Sent Events for AI analysis |
+| **Streaming** | Server-Sent Events for AI copilot |
 | **SDKs** | Python, TypeScript, Go CLI, Vercel AI, MCP |
-| **Auth** | Bearer token with scoped permissions |
-| **Rate Limits** | 30–600 req/min depending on plan |
-| **Environments** | Production, UAT, and Sandbox |
+| **Auth** | X-API-Key header |
+| **Rate Limits** | 30–300 req/min depending on plan |
+| **Environments** | Production and UAT |
 
 ## Choose Your SDK
 
@@ -71,7 +71,7 @@ import { VecTrade } from '@vectrade/sdk';
 
 const client = new VecTrade();
 const quote = await client.quotes.get('AAPL');
-console.log(`${quote.symbol}: $${quote.price} (${quote.changePct}%)`);
+console.log(`${quote.ticker}: $${quote.price} (${quote.change_percent}%)`);
 ```
 
 ```bash CLI
@@ -79,7 +79,7 @@ vectrade quote AAPL
 ```
 
 ```bash cURL
-curl -H "Authorization: Bearer $VECTRADE_API_KEY" \
+curl -H "X-API-Key: $VECTRADE_API_KEY" \
   https://api.vectrade.io/v1/vq/quotes/AAPL
 ```
 </CodeGroup>
@@ -90,12 +90,14 @@ curl -H "Authorization: Bearer $VECTRADE_API_KEY" \
 |---------|-------------|
 | **Real-time Quotes** | Sub-second market data for 100K+ instruments |
 | **Fundamentals** | Income statements, balance sheets, ratios, and company profiles |
+| **Company Profiles** | Sector, industry, exchange, and corporate details |
 | **Technicals** | 50+ indicators (RSI, MACD, Bollinger, etc.) with configurable periods |
-| **AI Analysis** | GPT-powered streaming analysis with source citations |
-| **Screening** | Filter the entire market with boolean rules and multi-factor criteria |
-| **Webhooks** | Real-time event delivery with HMAC-SHA256 verification |
-| **Options** | Full chains with Greeks, IV, and historical data |
+| **Sentiment** | Social & news sentiment scoring with directional signals |
+| **Historical Data** | OHLCV price history with configurable periods |
+| **Options** | Full chains with Greeks, IV, and expiration data |
 | **Analyst Data** | Wall Street consensus, price targets, and rating history |
+| **Earnings** | EPS history, beat/miss records, and upcoming dates |
+| **ETF Data** | NAV, holdings count, expense ratios for ETF instruments |
 
 ## Open Source
 
@@ -107,7 +109,7 @@ The entire VecTrade ecosystem is open source under the [VecTrade-io](https://git
 | [vectrade-node](https://github.com/VecTrade-io/vectrade-node) | TypeScript SDK (zero-dep, edge-ready) |
 | [vectrade-cli](https://github.com/VecTrade-io/vectrade-cli) | Go CLI with OAuth and shell completions |
 | [vectrade-ai-provider](https://github.com/VecTrade-io/vectrade-ai-provider) | Vercel AI SDK tool provider |
-| [vectrade-mcp](https://github.com/VecTrade-io/vectrade-mcp) | Model Context Protocol server (27 tools) |
+| [vectrade-mcp](https://github.com/VecTrade-io/vectrade-mcp) | Model Context Protocol server (16 tools) |
 | [finkit](https://github.com/VecTrade-io/finkit) | Financial analytics (indicators, risk, screening) |
 | [vectrade-openapi](https://github.com/VecTrade-io/vectrade-openapi) | OpenAPI 3.1 specification |
 | [vectrade-examples](https://github.com/VecTrade-io/vectrade-examples) | Runnable examples and templates |
