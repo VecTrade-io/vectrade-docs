@@ -3,7 +3,7 @@ info:
   title: VecTrade API
   version: 1.0.0
   description: |
-    Financial data, AI-powered analysis, and trading intelligence.
+    Virtual trading platform with free developer APIs — live market data, AI copilot, and trading intelligence.
 
     ## Authentication
     All requests require a Bearer token in the Authorization header:
