@@ -21,7 +21,7 @@ VecTrade → Fill Order → Update Portfolio → Leaderboard
 - Bot API is **separate** from the market data API
 - Bot trades are attributed to the **key owner** (you)
 - Bots **cannot** withdraw funds or transfer to other accounts
-- Rate limited to **20 orders/minute** and **120 requests/minute** per key
+- Rate limited to **20 orders/minute** and **120 requests/minute** per account
 
 ## Quick Start
 
@@ -110,18 +110,21 @@ Key management endpoints (create/list/revoke) use JWT authentication.
 
 ### Endpoints
 
+Public edge endpoints are under `/api/trade/v1/bot/*`.
+If you are testing directly against the trading service (for local/UAT integration), use `/api/v1/bot/*`.
+
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| POST | `/api/v1/bot/keys` | JWT | Create bot key |
-| GET | `/api/v1/bot/keys` | JWT | List your keys |
-| DELETE | `/api/v1/bot/keys/{id}` | JWT | Revoke a key |
-| GET | `/api/v1/bot/account` | Bot Key | Account info |
-| POST | `/api/v1/bot/orders` | Bot Key | Place order |
-| DELETE | `/api/v1/bot/orders/{id}` | Bot Key | Cancel order |
-| GET | `/api/v1/bot/orders` | Bot Key | List orders |
-| GET | `/api/v1/bot/orders/{id}` | Bot Key | Get order |
-| GET | `/api/v1/bot/portfolio` | Bot Key | Portfolio |
-| GET | `/api/v1/bot/kpi` | Bot Key | Trading KPIs |
+| POST | `/api/trade/v1/bot/keys` | JWT | Create bot key |
+| GET | `/api/trade/v1/bot/keys` | JWT | List your keys |
+| DELETE | `/api/trade/v1/bot/keys/{id}` | JWT | Revoke a key |
+| GET | `/api/trade/v1/bot/account` | Bot Key | Account info |
+| POST | `/api/trade/v1/bot/orders` | Bot Key | Place order |
+| DELETE | `/api/trade/v1/bot/orders/{id}` | Bot Key | Cancel order |
+| GET | `/api/trade/v1/bot/orders` | Bot Key | List orders |
+| GET | `/api/trade/v1/bot/orders/{id}` | Bot Key | Get order |
+| GET | `/api/trade/v1/bot/portfolio` | Bot Key | Portfolio |
+| GET | `/api/trade/v1/bot/kpi` | Bot Key | Trading KPIs |
 
 ### Place Order Schema
 
@@ -234,8 +237,8 @@ Order statuses: `OPEN`, `FILLED`, `PARTIALLY_FILLED`, `CANCELLED`, `REJECTED`
   "user_type": "HUMAN",
   "status": "ACTIVE",
   "created_at": "2025-01-15T10:00:00Z",
-  "api_calls_used": null,
-  "api_calls_limit": null,
+  "api_calls_used": 128,
+  "api_calls_limit": 10000,
   "plan": "Standard",
   "bot_keys_used": 1,
   "bot_keys_limit": 5
