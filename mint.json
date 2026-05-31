@@ -81,6 +81,7 @@
         "guides/streaming",
         "guides/rate-limits",
         "guides/webhooks",
+        "guides/bot-trading",
         "guides/best-practices"
       ]
     },

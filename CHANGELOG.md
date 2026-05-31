@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Bot Trading guide** (`guides/bot-trading.mdx`) — full documentation for AI agent trading API
+- Navigation entry in mint.json (under Guides group)
 - Professional governance (SECURITY, CONTRIBUTING, CODE_OF_CONDUCT)
 - CI workflow for broken link checking and build validation
 - `.editorconfig` for consistent formatting

@@ -99,7 +99,7 @@ console.log(text);
   "mcpServers": {
     "vectrade": {
       "command": "npx",
-      "args": ["-y", "@vectrade/mcp"],
+      "args": ["-y", "@vectrade/mcp-server"],
       "env": { "VECTRADE_API_KEY": "vq_live_..." }
     }
   }
@@ -165,6 +165,25 @@ python python/quickstart.py
 npm install
 npx tsx typescript/quickstart.ts
 ```
+
+## Bot Trading & AI Agent Examples
+
+The [`use-cases/ai-agent-trading/`](https://github.com/VecTrade-io/vectrade-examples/tree/main/use-cases/ai-agent-trading) directory contains complete working examples for bot trading:
+
+| Example | Description |
+|---------|-------------|
+| `python_openai_agent.py` | Build your own GPT-4o agent that trades via MCP |
+| `typescript_claude_agent.ts` | Claude-powered agent using Anthropic SDK + MCP |
+| `cron_strategy_bot.py` | Scheduled mean-reversion strategy (no AI required) |
+| `python/bot_trading.py` | Direct Bot API client class |
+| `typescript/bot-trading.ts` | Direct Bot API in TypeScript |
+
+<Note>
+  VecTrade does NOT host or run AI models. You bring your own LLM (or use no AI at all).
+  The MCP server exposes trading tools that any MCP-compatible agent can discover and use.
+</Note>
+
+See the [Bot Trading Guide](/guides/bot-trading) for full API reference.
 
 <Card title="vectrade-examples on GitHub" icon="github" href="https://github.com/VecTrade-io/vectrade-examples">
   Full source code with CI-tested examples for every SDK.

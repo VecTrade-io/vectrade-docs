@@ -5,7 +5,7 @@ description: "Use VecTrade financial tools in Claude Desktop, Cursor, VS Code, a
 
 ## Overview
 
-The VecTrade MCP server provides **16 financial data tools** to any AI IDE that supports the [Model Context Protocol](https://modelcontextprotocol.io/).
+The VecTrade MCP server provides **22 financial & trading tools** to any AI IDE that supports the [Model Context Protocol](https://modelcontextprotocol.io/).
 
 Supported clients: Claude Desktop, Cursor, VS Code Copilot, Windsurf, Cline, Continue.dev.
 
@@ -82,7 +82,7 @@ vectrade mcp setup claude
 vectrade mcp setup vscode
 ```
 
-## Available Tools (16)
+## Available Tools (22)
 
 ### Quotes & Market Data
 
@@ -135,6 +135,40 @@ vectrade mcp setup vscode
 | `get_options_chain` | Full options chain (calls & puts) |
 | `get_etf` | ETF info, holdings, sector weights, performance |
 
+### Trading (Bot API)
+
+<Note>Trading tools require a Bot API key (`tvt_...`) set in `VECTRADE_BOT_KEY`. See the [Bot Trading guide](/guides/bot-trading) for setup.</Note>
+
+| Tool | Description |
+|------|-------------|
+| `place_order` | Buy/sell stocks, crypto, forex, ETFs, options |
+| `cancel_order` | Cancel an open order |
+| `get_orders` | List recent orders (filter by status) |
+| `get_portfolio` | Cash balance + all positions with P&L |
+| `get_trading_kpi` | Performance metrics & leaderboard rank |
+| `get_bot_account` | Account info, status & API quota |
+
+## Trading Setup
+
+To enable AI agent trading, add your Bot API key:
+
+```json
+{
+  "mcpServers": {
+    "vectrade": {
+      "command": "npx",
+      "args": ["-y", "@vectrade/mcp-server"],
+      "env": {
+        "VECTRADE_API_KEY": "vq_your_key_here",
+        "VECTRADE_BOT_KEY": "tvt_your_bot_key"
+      }
+    }
+  }
+}
+```
+
+Create a Bot API key at [vectrade.io/vtrade/developer](https://vectrade.io/vtrade/developer) → Bot API Keys section.
+
 ## Example Usage
 
 Once configured, ask your AI assistant:
@@ -146,6 +180,9 @@ Once configured, ask your AI assistant:
 - "Get the options chain for SPY"
 - "What ETFs track the S&P 500?"
 - "Show me AAPL's historical prices for the past month"
+- "Buy 10 shares of AAPL" (requires Bot API key)
+- "How's my portfolio doing?" (requires Bot API key)
+- "Set a stop-loss on TSLA at $250" (requires Bot API key)
 
 ## Verification
 
@@ -159,4 +196,5 @@ If authentication fails, verify your API key is correct and active at [vectrade.
 
 - [GitHub Repository](https://github.com/VecTrade-io/vectrade-mcp)
 - [Examples](https://github.com/VecTrade-io/vectrade-examples)
+- [Custom AI Agent Examples](https://github.com/VecTrade-io/vectrade-examples/tree/main/use-cases/ai-agent-trading) — Build your own trading agent (OpenAI, Claude, cron)
 - [Get API Key](https://vectrade.io/vtrade/developer)

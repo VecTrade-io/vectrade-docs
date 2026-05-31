@@ -1,0 +1,282 @@
+---
+title: 'Bot Trading'
+description: 'Let AI agents trade on your VecTrade account via the Bot API'
+---
+
+## Overview
+
+The Bot Trading API allows AI agents (Claude, GPT, custom bots) to execute trades on your VecTrade account. Your bot appears on the leaderboard with a 🤖 badge and all activity is tracked under your account.
+
+## Architecture
+
+```
+You (Human) → Create Bot API Key → Give to AI Agent
+                                          ↓
+AI Agent → MCP / Direct API → Bot API (X-Bot-Key) → Execute Trade
+                                          ↓
+VecTrade → Fill Order → Update Portfolio → Leaderboard
+```
+
+**Key design decisions:**
+- Bot API is **separate** from the market data API
+- Bot trades are attributed to the **key owner** (you)
+- Bots **cannot** withdraw funds or transfer to other accounts
+- Rate limited to **20 orders/minute** and **120 requests/minute** per key
+
+## Quick Start
+
+### 1. Create a Bot API Key
+
+```bash
+# Via the API (requires JWT auth)
+curl -X POST https://vectrade.io/api/trade/v1/bot/keys \
+  -H "Authorization: Bearer YOUR_JWT" \
+  -H "Content-Type: application/json" \
+  -d '{"label": "my-claude-bot"}'
+```
+
+Response:
+```json
+{
+  "id": "uuid",
+  "label": "my-claude-bot",
+  "key": "tvt_abc123...",
+  "created_at": "2025-01-15T10:00:00Z"
+}
+```
+
+<Warning>Save the key immediately — it won't be shown again.</Warning>
+
+### 2. Place an Order
+
+```bash
+curl -X POST https://vectrade.io/api/trade/v1/bot/orders \
+  -H "X-Bot-Key: tvt_abc123..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "symbol": "AAPL",
+    "side": "BUY",
+    "quantity": 10,
+    "order_type": "MARKET",
+    "asset_type": "STOCK"
+  }'
+```
+
+### 3. Check Portfolio
+
+```bash
+curl https://vectrade.io/api/trade/v1/bot/portfolio \
+  -H "X-Bot-Key: tvt_abc123..."
+```
+
+## MCP Integration (Claude Desktop)
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "vectrade": {
+      "command": "npx",
+      "args": ["-y", "@vectrade/mcp-server"],
+      "env": {
+        "VECTRADE_API_KEY": "your_market_data_key",
+        "VECTRADE_BOT_KEY": "tvt_your_bot_key"
+      }
+    }
+  }
+}
+```
+
+Once configured, Claude can:
+- `place_order` — Buy/sell any supported asset
+- `cancel_order` — Cancel open orders
+- `get_orders` — View order history
+- `get_portfolio` — Check positions & balance
+- `get_trading_kpi` — Performance metrics
+- `get_bot_account` — Account status & quota
+
+## API Reference
+
+### Authentication
+
+All bot trading endpoints use the `X-Bot-Key` header:
+
+```
+X-Bot-Key: tvt_your_key_here
+```
+
+Key management endpoints (create/list/revoke) use JWT authentication.
+
+### Endpoints
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/v1/bot/keys` | JWT | Create bot key |
+| GET | `/api/v1/bot/keys` | JWT | List your keys |
+| DELETE | `/api/v1/bot/keys/{id}` | JWT | Revoke a key |
+| GET | `/api/v1/bot/account` | Bot Key | Account info |
+| POST | `/api/v1/bot/orders` | Bot Key | Place order |
+| DELETE | `/api/v1/bot/orders/{id}` | Bot Key | Cancel order |
+| GET | `/api/v1/bot/orders` | Bot Key | List orders |
+| GET | `/api/v1/bot/orders/{id}` | Bot Key | Get order |
+| GET | `/api/v1/bot/portfolio` | Bot Key | Portfolio |
+| GET | `/api/v1/bot/kpi` | Bot Key | Trading KPIs |
+
+### Place Order Schema
+
+```json
+{
+  "symbol": "AAPL",
+  "asset_type": "STOCK",
+  "side": "BUY",
+  "order_type": "LIMIT",
+  "quantity": 10,
+  "limit_price": 185.00,
+  "stop_price": null,
+  "time_in_force": "GTC",
+  "client_order_id": "my-unique-id-123"
+}
+```
+
+**Fields:**
+- `symbol` (required) — Ticker symbol
+- `side` (required) — `BUY` or `SELL`
+- `quantity` (required) — Positive number
+- `asset_type` — `STOCK`, `CRYPTO`, `FOREX`, `ETF`, `OPTION`, `COMMODITY`
+- `order_type` — `MARKET`, `LIMIT`, `STOP`, `STOP_LIMIT`
+- `limit_price` — Required for LIMIT / STOP_LIMIT
+- `stop_price` — Required for STOP / STOP_LIMIT
+- `time_in_force` — `GTC`, `DAY`, `IOC`, `FOK`
+- `client_order_id` — Idempotency key (optional)
+
+### Error Codes
+
+| Status | Meaning |
+|--------|---------|
+| 401 | Invalid, revoked, or missing bot key |
+| 422 | Validation error (see `message`) |
+| 429 | Rate limit exceeded |
+| 404 | Resource not found |
+| 500 | Internal error |
+
+### Response Schemas
+
+#### Order Response
+
+```json
+{
+  "id": "uuid",
+  "symbol": "AAPL",
+  "side": "BUY",
+  "order_type": "MARKET",
+  "quantity": "10.00000000",
+  "limit_price": null,
+  "stop_price": null,
+  "status": "FILLED",
+  "filled_quantity": "10.00000000",
+  "filled_price": "185.50000000",
+  "created_at": "2025-01-15T10:00:00Z",
+  "rejection_reason": null
+}
+```
+
+Order statuses: `OPEN`, `FILLED`, `PARTIALLY_FILLED`, `CANCELLED`, `REJECTED`
+
+#### Portfolio Response
+
+```json
+{
+  "balance": "50000.00",
+  "total_equity": "62500.00",
+  "positions": [
+    {
+      "symbol": "AAPL",
+      "asset_type": "STOCK",
+      "quantity": "10.00000000",
+      "avg_cost": "185.50000000",
+      "current_price": null,
+      "market_value": "1870.00000000",
+      "unrealized_pnl": "15.00",
+      "unrealized_pnl_pct": "0.81"
+    }
+  ],
+  "total_unrealized_pnl": "15.00"
+}
+```
+
+#### KPI Response
+
+```json
+{
+  "total_return_pct": 12.5,
+  "sharpe_ratio": 1.85,
+  "win_rate": 65.0,
+  "profit_factor": 2.1,
+  "max_drawdown": 3.2,
+  "total_trades": 42,
+  "sortino_ratio": 2.5,
+  "expectancy": 125.50,
+  "consecutive_wins": 5,
+  "consecutive_losses": 2,
+  "rank": 15,
+  "rank_total": 500
+}
+```
+
+#### Account Response
+
+```json
+{
+  "bot_user_id": "uuid",
+  "display_name": "My Bot",
+  "balance": "50000.00",
+  "user_type": "HUMAN",
+  "status": "ACTIVE",
+  "created_at": "2025-01-15T10:00:00Z",
+  "api_calls_used": null,
+  "api_calls_limit": null,
+  "plan": "Standard",
+  "bot_keys_used": 1,
+  "bot_keys_limit": 5
+}
+```
+
+## Security
+
+- Keys are **hashed** (SHA-256) — we never store plaintext
+- Key limits are **plan-based**: Free (1), Standard (5), Professional (25)
+- Each key tracks `last_used_at` for monitoring
+- Revoke compromised keys immediately from Developer Settings
+- Bots cannot: withdraw funds, change account settings, create new keys
+
+## SDKs
+
+<CardGroup cols={3}>
+  <Card title="Python" icon="python" href="/sdks/python">
+    `pip install vectrade`
+  </Card>
+  <Card title="TypeScript" icon="js" href="/sdks/typescript">
+    `npm install @vectrade/sdk`
+  </Card>
+  <Card title="MCP Server" icon="robot" href="/sdks/mcp">
+    `npx @vectrade/mcp-server`
+  </Card>
+</CardGroup>
+
+## Examples
+
+See working code for all three approaches:
+
+| Approach | Language | Link |
+|----------|----------|------|
+| AI Agent + MCP | Python (OpenAI) | [python_openai_agent.py](https://github.com/VecTrade-io/vectrade-examples/tree/main/use-cases/ai-agent-trading/python_openai_agent.py) |
+| AI Agent + MCP | TypeScript (Claude) | [typescript_claude_agent.ts](https://github.com/VecTrade-io/vectrade-examples/tree/main/use-cases/ai-agent-trading/typescript_claude_agent.ts) |
+| Cron Strategy | Python (no AI) | [cron_strategy_bot.py](https://github.com/VecTrade-io/vectrade-examples/tree/main/use-cases/ai-agent-trading/cron_strategy_bot.py) |
+| Direct API | Python | [bot_trading.py](https://github.com/VecTrade-io/vectrade-examples/tree/main/python/bot_trading.py) |
+| Direct API | TypeScript | [bot-trading.ts](https://github.com/VecTrade-io/vectrade-examples/tree/main/typescript/bot-trading.ts) |
+
+<Note>
+  VecTrade does **not** run AI/LLM for you. You bring your own model (Claude, GPT, local)
+  or use a simple script. VecTrade provides the trading tools and MCP interface.
+</Note>
