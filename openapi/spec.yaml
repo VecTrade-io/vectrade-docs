@@ -1824,45 +1824,6 @@ components:
           type: string
           format: date-time
 
-  responses:
-    Unauthorized:
-      description: Authentication failed
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Error"
-    NotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Error"
-    RateLimited:
-      description: Rate limit exceeded
-      headers:
-        Retry-After:
-          schema:
-            type: number
-        X-VQ-RateLimit-Limit:
-          schema:
-            type: integer
-        X-VQ-RateLimit-Remaining:
-          schema:
-            type: integer
-        X-VQ-RateLimit-Reset:
-          schema:
-            type: integer
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Error"
-    ValidationError:
-      description: Invalid request parameters
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Error"
-
     # ─── Bot Trading Schemas ──────────────────────────────────────
 
     BotPlaceOrderRequest:
@@ -2044,3 +2005,42 @@ components:
         bot_keys_limit:
           type: integer
           nullable: true
+
+  responses:
+    Unauthorized:
+      description: Authentication failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          schema:
+            type: number
+        X-VQ-RateLimit-Limit:
+          schema:
+            type: integer
+        X-VQ-RateLimit-Remaining:
+          schema:
+            type: integer
+        X-VQ-RateLimit-Reset:
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
