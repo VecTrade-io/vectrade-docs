@@ -17,11 +17,18 @@ Thumbs.db
 *.bak
 *.swp
 
-# Scripts (keep only check-links.mjs for CI)
+# Scripts (keep check-links.mjs for CI)
 scripts/capture-*.mjs
 scripts/debug-*.mjs
 scripts/recap-*.mjs
 scripts/seed-*.py
+scripts/consolidate-docs.mjs
+
+# Consolidated docs output
+vectrade-docs.mdx
+
+# Consolidation workflow (local-only)
+.github/workflows/consolidate-docs.yml
 
 # Build output
 .mintlify/

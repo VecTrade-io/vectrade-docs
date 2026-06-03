@@ -1,6 +1,6 @@
 ---
 title: "API Reference"
-description: "Complete reference for the VecTrade REST API — 16 endpoints across market data, analyst research, options, and portfolio intelligence."
+description: "Complete reference for the VecTrade REST API, generated from the canonical OpenAPI contract."
 ---
 
 # API Reference
@@ -42,20 +42,7 @@ Get your key at [vectrade.io/vtrade/developer](https://vectrade.io/vtrade/develo
 
 ## Quick Summary
 
-| Group | Endpoints | Description |
-|-------|-----------|-------------|
-| **Quotes** | `GET /vq/quotes/{symbol}`, `POST /vq/quotes/batch` | Real-time and batch price data |
-| **Fundamentals** | `GET /vq/fundamentals/{symbol}`, `/statements` | Financial statements and ratios |
-| **Profile** | `GET /vq/profile/{symbol}` | Company info, sector, industry, exchange |
-| **Technicals** | `GET /vq/technical/{symbol}` | 50+ indicators with configurable intervals |
-| **News** | `GET /vq/news/{symbol}` | Market news with sentiment scoring |
-| **Sentiment** | `GET /vq/sentiment/{symbol}` | Social & news sentiment signals |
-| **Analyst** | `GET /vq/analyst-consensus/{symbol}`, `/analyst-targets/{symbol}`, `/upgrades-downgrades/{symbol}` | Wall Street consensus data |
-| **Earnings** | `GET /vq/earnings/{symbol}` | Earnings history and surprise records |
-| **Insider** | `GET /vq/insider/{symbol}` | Insider trading activity |
-| **Options** | `GET /vq/options/{symbol}/chain` | Options chains with Greeks |
-| **Historical** | `GET /vq/quotes/{symbol}/history` | OHLCV price history |
-| **ETF** | `GET /vq/etf/{symbol}` | ETF profile, NAV, and holdings info |
+Use the endpoint pages in this section as the primary reference. Each page binds to an OpenAPI operation via its `openapi` frontmatter key, so the method/path mapping is validated against the checked-in spec.
 
 ## SDKs
 

@@ -24,7 +24,7 @@ mintlify dev
 │   ├── dark.svg           # Logo for dark mode
 │   └── light.svg          # Logo for light mode
 ├── openapi/
-│   └── spec.yaml          # OpenAPI 3.1 spec (27 endpoints)
+│   └── spec.yaml          # OpenAPI 3.1 source-of-truth spec
 ├── introduction.mdx       # Landing page
 ├── quickstart.mdx         # Getting started (5 min)
 ├── guides/

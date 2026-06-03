@@ -3,12 +3,12 @@ info:
   title: VecTrade API
   version: 1.0.0
   description: |
-    Virtual trading platform with free developer APIs — live market data, AI copilot, and trading intelligence.
+    Financial data, AI-powered analysis, and trading intelligence.
 
     ## Authentication
-    All requests require a Bearer token in the Authorization header:
+    All requests require an API key in the `X-API-Key` header:
     ```
-    Authorization: Bearer vq_live_...
+    X-API-Key: vq_your_key_here
     ```
 
     ## Rate Limits
@@ -27,11 +27,9 @@ info:
 servers:
   - url: https://api.vectrade.io/v1
     description: Production & Sandbox (mode determined by API key prefix)
-  - url: https://vectrade.io/api/trade/v1
-    description: Bot Trading API (requires X-Bot-Key)
 
 security:
-  - BearerAuth: []
+  - ApiKeyAuth: []
 
 paths:
   /vq/quotes/{symbol}:
@@ -124,7 +122,7 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  /vq/fundamentals/{symbol}/income:
+  /vq/fundamentals/{symbol}/statements:
     get:
       operationId: getIncomeStatement
       summary: Get income statement
@@ -166,7 +164,7 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  /vq/fundamentals/{symbol}/balance-sheet:
+  /vq/fundamentals/{symbol}/balance-sheet:  # DEPRECATED - use /statements
     get:
       operationId: getBalanceSheet
       summary: Get balance sheet
@@ -208,7 +206,7 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  /vq/technicals/{symbol}:
+  /vq/technical/{symbol}:
     get:
       operationId: getTechnicals
       summary: Get technical indicators
@@ -252,7 +250,7 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  /vq/news:
+  /vq/news/{symbol}:
     get:
       operationId: listNews
       summary: List financial news
@@ -554,7 +552,7 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  /vq/options/{symbol}:
+  /vq/options/{symbol}/chain:
     get:
       operationId: getOptionsChain
       summary: Get options chain
@@ -623,7 +621,7 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  /vq/analyst/{symbol}/consensus:
+  /vq/analyst-consensus/{symbol}:
     get:
       operationId: getAnalystConsensus
       summary: Get analyst consensus rating
@@ -649,7 +647,7 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  /vq/analyst/{symbol}/price-targets:
+  /vq/analyst-targets/{symbol}:
     get:
       operationId: getAnalystPriceTargets
       summary: Get analyst price targets
@@ -680,7 +678,7 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  /vq/analyst/{symbol}/ratings:
+  /vq/upgrades-downgrades/{symbol}:
     get:
       operationId: getAnalystRatings
       summary: Get recent analyst rating changes
@@ -716,7 +714,7 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  /vq/earnings/{symbol}/history:
+  /vq/earnings/{symbol}:
     get:
       operationId: getEarningsHistory
       summary: Get historical earnings results
@@ -786,7 +784,7 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  /vq/insider/{symbol}/transactions:
+  /vq/insider/{symbol}:
     get:
       operationId: getInsiderTransactions
       summary: Get insider transactions
@@ -822,7 +820,7 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  /vq/insider/{symbol}/summary:
+  /vq/insider/{symbol}/summary:  # DEPRECATED - use /insider/{symbol}
     get:
       operationId: getInsiderSummary
       summary: Get insider trading summary
@@ -1012,177 +1010,218 @@ paths:
         "429":
           $ref: "#/components/responses/RateLimited"
 
-  # ─── Bot Trading API ──────────────────────────────────────────────
-
-  /bot/account:
+  /vq/profile/{symbol}:
     get:
-      operationId: getBotAccount
-      summary: Get bot account info
-      description: Returns account details, balance, plan, and bot key usage.
-      tags: [Bot Trading]
-      security:
-        - BotKeyAuth: []
-      responses:
-        "200":
-          description: Account info
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BotAccount"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-
-  /bot/orders:
-    get:
-      operationId: getBotOrders
-      summary: List bot orders
-      description: Returns recent orders, filterable by status.
-      tags: [Bot Trading]
-      security:
-        - BotKeyAuth: []
+      operationId: getCompanyProfile
+      summary: Get company profile
+      description: Get company information including sector, industry, description, and location.
+      tags: [Fundamentals]
       parameters:
-        - name: status
-          in: query
-          schema:
-            type: string
-            enum: [OPEN, FILLED, CANCELLED, REJECTED, PARTIALLY_FILLED]
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 20
-            maximum: 100
-      responses:
-        "200":
-          description: List of orders
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BotOrder"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
-    post:
-      operationId: placeBotOrder
-      summary: Place a trade order
-      description: Place a buy/sell order. Supports MARKET, LIMIT, STOP, and STOP_LIMIT.
-      tags: [Bot Trading]
-      security:
-        - BotKeyAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/BotPlaceOrderRequest"
-      responses:
-        "201":
-          description: Order created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BotOrder"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-        "429":
-          $ref: "#/components/responses/RateLimited"
-
-  /bot/orders/{order_id}:
-    get:
-      operationId: getBotOrder
-      summary: Get a single order
-      tags: [Bot Trading]
-      security:
-        - BotKeyAuth: []
-      parameters:
-        - name: order_id
+        - name: symbol
           in: path
           required: true
           schema:
             type: string
-            format: uuid
+          example: AAPL
       responses:
         "200":
-          description: Order details
+          description: Company profile data
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BotOrder"
+                type: object
+                properties:
+                  ticker:
+                    type: string
+                  company:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      sector:
+                        type: string
+                      industry:
+                        type: string
+                      exchange:
+                        type: string
+                      website:
+                        type: string
+                  location:
+                    type: object
+                    properties:
+                      country:
+                        type: string
+                      state:
+                        type: string
+                      city:
+                        type: string
+                  overview:
+                    type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
-          description: Order not found
-    delete:
-      operationId: cancelBotOrder
-      summary: Cancel an open order
-      tags: [Bot Trading]
-      security:
-        - BotKeyAuth: []
+          $ref: "#/components/responses/NotFound"
+
+  /vq/sentiment/{symbol}:
+    get:
+      operationId: getSentiment
+      summary: Get sentiment analysis
+      description: Get sentiment score, news sentiment breakdown, and social media metrics.
+      tags: [Sentiment]
       parameters:
-        - name: order_id
+        - name: symbol
           in: path
           required: true
           schema:
             type: string
-            format: uuid
+          example: AAPL
       responses:
-        "204":
-          description: Order cancelled
+        "200":
+          description: Sentiment data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sentiment_score:
+                    type: number
+                  signal:
+                    type: string
+                  sentiment_trend:
+                    type: string
+                  news_sentiment_breakdown:
+                    type: object
+                    properties:
+                      positive:
+                        type: integer
+                      neutral:
+                        type: integer
+                      negative:
+                        type: integer
+                  social_sentiment:
+                    type: object
+                    properties:
+                      twitter_sentiment:
+                        type: number
+                      reddit_sentiment:
+                        type: number
+                      stocktwits_sentiment:
+                        type: number
+                      mentions_24h:
+                        type: integer
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /vq/quotes/{symbol}/history:
+    get:
+      operationId: getHistoricalPrices
+      summary: Get historical prices
+      description: Get historical OHLCV price data for a symbol.
+      tags: [Quotes]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+          example: AAPL
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: ["5d", "1mo", "3mo", "6mo", "1y", "5y"]
+            default: "5d"
+      responses:
+        "200":
+          description: Historical price data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ticker:
+                    type: string
+                  market:
+                    type: string
+                  history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                        open:
+                          type: number
+                        high:
+                          type: number
+                        low:
+                          type: number
+                        close:
+                          type: number
+                        volume:
+                          type: integer
+                        adj_close:
+                          type: number
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /vq/etf/{symbol}:
+    get:
+      operationId: getETF
+      summary: Get ETF data
+      description: Get ETF information, holdings, sector weights, and performance.
+      tags: [ETF]
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+          example: SPY
+      responses:
+        "200":
+          description: ETF data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ticker:
+                    type: string
+                  name:
+                    type: string
+                  category:
+                    type: string
+                  fund_family:
+                    type: string
+                  expense_ratio:
+                    type: number
+                  total_assets:
+                    type: number
+                  nav_price:
+                    type: number
+                  ytd_return:
+                    type: number
+                  trailing_pe:
+                    type: number
+                  top_holdings:
+                    type: array
+                    items:
+                      type: object
+                  sector_weights:
+                    type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
-          description: Order not found
-        "422":
-          description: Order cannot be cancelled (already filled/cancelled)
-
-  /bot/portfolio:
-    get:
-      operationId: getBotPortfolio
-      summary: Get portfolio
-      description: Returns cash balance, total equity, and all open positions.
-      tags: [Bot Trading]
-      security:
-        - BotKeyAuth: []
-      responses:
-        "200":
-          description: Portfolio
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BotPortfolio"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-
-  /bot/kpi:
-    get:
-      operationId: getBotKPI
-      summary: Get trading KPIs
-      description: Returns performance metrics — return, Sharpe, win rate, drawdown, and leaderboard rank.
-      tags: [Bot Trading]
-      security:
-        - BotKeyAuth: []
-      responses:
-        "200":
-          description: KPIs
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BotKPI"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+          $ref: "#/components/responses/NotFound"
 
 components:
   securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: "vq_live_..."
-    BotKeyAuth:
+    ApiKeyAuth:
       type: apiKey
       in: header
-      name: X-Bot-Key
-      description: "Bot API key (tvt_... format)"
+      name: X-API-Key
+      description: "VecTrade API key (e.g., vq_live_...)"
 
   schemas:
     Quote:
@@ -1823,188 +1862,6 @@ components:
         resetAt:
           type: string
           format: date-time
-
-    # ─── Bot Trading Schemas ──────────────────────────────────────
-
-    BotPlaceOrderRequest:
-      type: object
-      required: [symbol, side, quantity, asset_type]
-      properties:
-        symbol:
-          type: string
-          description: Ticker symbol (e.g., AAPL, BTC-USD)
-        asset_type:
-          type: string
-          enum: [STOCK, CRYPTO, FOREX, ETF, OPTION, COMMODITY]
-        side:
-          type: string
-          enum: [BUY, SELL]
-        order_type:
-          type: string
-          enum: [MARKET, LIMIT, STOP, STOP_LIMIT]
-          default: MARKET
-        quantity:
-          type: number
-          minimum: 0
-          exclusiveMinimum: true
-        limit_price:
-          type: number
-          nullable: true
-          description: Required for LIMIT and STOP_LIMIT orders
-        stop_price:
-          type: number
-          nullable: true
-          description: Required for STOP and STOP_LIMIT orders
-        time_in_force:
-          type: string
-          enum: [GTC, DAY, IOC, FOK]
-          default: GTC
-        client_order_id:
-          type: string
-          nullable: true
-          description: Idempotency key (max 64 chars)
-
-    BotOrder:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        symbol:
-          type: string
-        side:
-          type: string
-          enum: [BUY, SELL]
-        order_type:
-          type: string
-          enum: [MARKET, LIMIT, STOP, STOP_LIMIT]
-        quantity:
-          type: string
-        limit_price:
-          type: string
-          nullable: true
-        stop_price:
-          type: string
-          nullable: true
-        status:
-          type: string
-          enum: [OPEN, FILLED, PARTIALLY_FILLED, CANCELLED, REJECTED]
-        filled_quantity:
-          type: string
-          nullable: true
-        filled_price:
-          type: string
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-        rejection_reason:
-          type: string
-          nullable: true
-
-    BotPortfolio:
-      type: object
-      properties:
-        balance:
-          type: string
-        total_equity:
-          type: string
-        positions:
-          type: array
-          items:
-            $ref: "#/components/schemas/BotPosition"
-        total_unrealized_pnl:
-          type: string
-          nullable: true
-
-    BotPosition:
-      type: object
-      properties:
-        symbol:
-          type: string
-        asset_type:
-          type: string
-          enum: [STOCK, CRYPTO, FOREX, ETF, OPTION, COMMODITY]
-        quantity:
-          type: string
-        avg_cost:
-          type: string
-        current_price:
-          type: string
-          nullable: true
-        market_value:
-          type: string
-          nullable: true
-        unrealized_pnl:
-          type: string
-          nullable: true
-        unrealized_pnl_pct:
-          type: string
-          nullable: true
-
-    BotKPI:
-      type: object
-      properties:
-        total_return_pct:
-          type: number
-        sharpe_ratio:
-          type: number
-        win_rate:
-          type: number
-        profit_factor:
-          type: number
-        max_drawdown:
-          type: number
-        total_trades:
-          type: integer
-        sortino_ratio:
-          type: number
-        expectancy:
-          type: number
-        consecutive_wins:
-          type: integer
-        consecutive_losses:
-          type: integer
-        rank:
-          type: integer
-          nullable: true
-        rank_total:
-          type: integer
-          nullable: true
-
-    BotAccount:
-      type: object
-      properties:
-        bot_user_id:
-          type: string
-          format: uuid
-        display_name:
-          type: string
-        balance:
-          type: string
-        user_type:
-          type: string
-        status:
-          type: string
-          enum: [ACTIVE, SUSPENDED]
-        created_at:
-          type: string
-          format: date-time
-        api_calls_used:
-          type: integer
-          nullable: true
-        api_calls_limit:
-          type: integer
-          nullable: true
-        plan:
-          type: string
-          nullable: true
-        bot_keys_used:
-          type: integer
-          nullable: true
-        bot_keys_limit:
-          type: integer
-          nullable: true
 
   responses:
     Unauthorized:

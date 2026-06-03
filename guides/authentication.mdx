@@ -5,7 +5,10 @@ description: How to authenticate with the VecTrade API and manage API keys secur
 
 # Authentication
 
-All VecTrade API requests require authentication via the `X-API-Key` header.
+All VecTrade API requests require authentication with your VecTrade API key.
+
+Use `X-API-Key` as the primary header for hosted/public API traffic.
+Some direct deployments also accept `Authorization: Bearer vq_...`, but `X-API-Key` is the stable default.
 
 ## API Key Format
 
@@ -21,6 +24,13 @@ X-API-Key: vq_aaJFCQFZpv8BZU_RuLLAHlXP_Md3A55GhNeVtnn3Ykk
 
 ```bash
 curl -H "X-API-Key: $VECTRADE_API_KEY" \
+  https://api.vectrade.io/v1/vq/quotes/AAPL
+```
+
+Alternative header form (when supported by your deployment):
+
+```bash
+curl -H "Authorization: Bearer $VECTRADE_API_KEY" \
   https://api.vectrade.io/v1/vq/quotes/AAPL
 ```
 

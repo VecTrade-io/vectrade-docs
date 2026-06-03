@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "mintlify dev",
     "check-links": "node scripts/check-links.mjs",
+    "consolidate": "node scripts/consolidate-docs.mjs",
     "validate": "npm run check-links"
   },
   "devDependencies": {

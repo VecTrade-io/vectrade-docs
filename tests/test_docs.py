@@ -10,6 +10,7 @@ Tests verify:
 
 from __future__ import annotations
 
+import ast
 import json
 import re
 from pathlib import Path
@@ -65,6 +66,13 @@ class TestMintConfig:
     def test_has_api_config(self, mint_config):
         """API docs should have api/openapi config."""
         assert "api" in mint_config or "openapi" in mint_config
+
+    def test_api_auth_uses_x_api_key(self, mint_config):
+        """Hosted docs should default to API key auth to match runtime edge contract."""
+        api = mint_config.get("api", {})
+        auth = api.get("auth", {})
+        assert auth.get("method") == "key"
+        assert auth.get("name") == "X-API-Key"
 
 
 class TestPageReferences:
@@ -175,3 +183,118 @@ class TestOpenAPIIntegration:
         if openapi_dir.exists():
             files = list(openapi_dir.glob("*.yaml")) + list(openapi_dir.glob("*.json"))
             assert len(files) > 0, "No OpenAPI spec files found"
+
+
+class TestRuntimeContractAlignment:
+    """Classify API reference bindings as runtime-backed or explicitly spec-only."""
+
+    RUNTIME_ROUTERS = [
+        ROOT.parent / "vectrade-core" / "trading" / "vectrade" / "router.py",
+        ROOT.parent / "vectrade-core" / "trading" / "vectrade" / "developer_router.py",
+    ]
+
+    # These pages are currently documented from canonical spec but not served by
+    # the runtime routers above. Keep this list explicit to make drift intentional.
+    SPEC_ONLY_DOCS = {
+        "api-reference/analyst/consensus.mdx",
+        "api-reference/analyst/price-targets.mdx",
+        "api-reference/analyst/ratings.mdx",
+        "api-reference/earnings/calendar.mdx",
+        "api-reference/fundamentals/balance-sheet.mdx",
+        "api-reference/fundamentals/income-statement.mdx",
+        "api-reference/insider/summary.mdx",
+        "api-reference/options/chain.mdx",
+        "api-reference/options/expirations.mdx",
+        "api-reference/screener/run-screener.mdx",
+        "api-reference/technicals/get-technicals.mdx",
+        "api-reference/webhooks/create.mdx",
+        "api-reference/webhooks/delete.mdx",
+        "api-reference/webhooks/list.mdx",
+    }
+
+    @staticmethod
+    def _normalize_path_params(path: str) -> str:
+        """Normalize dynamic path param names so symbol/ticker naming differences don't fail checks."""
+        return re.sub(r"\{[^}]+\}", "{symbol}", path)
+
+    @classmethod
+    def _extract_runtime_operations(cls, router_path: Path) -> set[str]:
+        """Extract `METHOD /vq/...` operations directly from FastAPI decorators."""
+        src = router_path.read_text()
+        tree = ast.parse(src)
+
+        prefix = ""
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "router" for t in node.targets):
+                call = node.value
+                if isinstance(call, ast.Call) and getattr(call.func, "id", None) == "APIRouter":
+                    for kw in call.keywords:
+                        if kw.arg == "prefix" and isinstance(kw.value, ast.Constant):
+                            prefix = str(kw.value.value)
+
+        operations: set[str] = set()
+        for node in tree.body:
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            for dec in node.decorator_list:
+                if not isinstance(dec, ast.Call):
+                    continue
+                if not isinstance(dec.func, ast.Attribute):
+                    continue
+                if not (isinstance(dec.func.value, ast.Name) and dec.func.value.id == "router"):
+                    continue
+                method = dec.func.attr.lower()
+                if method not in {"get", "post", "put", "patch", "delete"}:
+                    continue
+                if not dec.args or not isinstance(dec.args[0], ast.Constant):
+                    continue
+
+                route_path = str(dec.args[0].value)
+                full = f"{prefix}{route_path}".replace("/api/v1", "")
+                normalized = cls._normalize_path_params(full)
+                operations.add(f"{method.upper()} {normalized}")
+
+        return operations
+
+    @staticmethod
+    def _extract_doc_openapi_operation(doc_path: Path) -> str | None:
+        """Read frontmatter `openapi: \"METHOD /path\"` from an MDX file."""
+        content = doc_path.read_text()
+        match = re.search(r'openapi:\s*"([A-Z]+\s+[^\"]+)"', content)
+        return match.group(1).strip() if match else None
+
+    def test_api_reference_pages_are_runtime_backed_or_explicitly_spec_only(self):
+        """Every API page must be either code-backed or intentionally spec-only."""
+        missing_router_files = [p for p in self.RUNTIME_ROUTERS if not p.exists()]
+        if missing_router_files:
+            pytest.skip(f"Runtime router(s) not available in this checkout: {missing_router_files}")
+
+        runtime_ops: set[str] = set()
+        for router in self.RUNTIME_ROUTERS:
+            runtime_ops |= self._extract_runtime_operations(router)
+
+        api_pages = sorted(Path(ROOT / "api-reference").rglob("*.mdx"))
+        unclassified = []
+
+        for page in api_pages:
+            rel = str(page.relative_to(ROOT))
+            if rel == "api-reference/overview.mdx":
+                continue
+            op = self._extract_doc_openapi_operation(page)
+            assert op is not None, f"Missing openapi frontmatter in: {rel}"
+
+            method, path = op.split(" ", 1)
+            normalized_op = f"{method} {self._normalize_path_params(path)}"
+            if normalized_op in runtime_ops:
+                continue
+            if rel in self.SPEC_ONLY_DOCS:
+                continue
+            unclassified.append((rel, op))
+
+        stale_allowlist = [rel for rel in sorted(self.SPEC_ONLY_DOCS) if not (ROOT / rel).exists()]
+
+        assert not stale_allowlist, f"SPEC_ONLY_DOCS contains missing pages: {stale_allowlist}"
+        assert not unclassified, (
+            "API pages not backed by runtime and not declared spec-only: "
+            f"{unclassified}"
+        )

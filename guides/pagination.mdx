@@ -115,8 +115,8 @@ const allArticles = await client.news.list({ limit: 100 }).toArray();
 |----------|----------|---------------|
 | `GET /vq/news` | News articles | 20 |
 | `GET /vq/earnings/calendar` | Earnings dates | 20 |
-| `GET /vq/insider/{symbol}/transactions` | Insider trades | 20 |
-| `GET /vq/analyst/{symbol}/ratings` | Analyst ratings | 20 |
+| `GET /vq/insider/{symbol}` | Insider trades | 20 |
+| `GET /vq/upgrades-downgrades/{symbol}` | Analyst ratings | 20 |
 | `GET /vq/webhooks` | Webhook subscriptions | 20 |
 | `GET /vq/developer/keys` | API keys | 20 |
 

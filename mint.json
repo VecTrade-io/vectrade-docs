@@ -165,8 +165,8 @@
   "api": {
     "baseUrl": "https://api.vectrade.io/v1",
     "auth": {
-      "method": "bearer",
-      "name": "Authorization"
+      "method": "key",
+      "name": "X-API-Key"
     },
     "playground": {
       "mode": "simple"
