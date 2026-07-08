@@ -136,6 +136,21 @@ Yes. The same approach works for all MCP-compatible clients:
 
 Different clients use slightly different JSON keys (`mcpServers` vs `servers`).
 
+### Config file locations by OS
+
+Use this table to find where to place each config snippet:
+
+| Client | macOS | Linux | Windows |
+|---|---|---|---|
+| Claude Code / Claude Desktop | `~/.config/claude/claude_desktop_config.json` | `~/.config/claude/claude_desktop_config.json` | `%APPDATA%/Claude/claude_desktop_config.json` |
+| Cursor | `<project>/.cursor/mcp.json` | `<project>/.cursor/mcp.json` | `<project>/.cursor/mcp.json` |
+| VS Code / GitHub Copilot | `<project>/.vscode/mcp.json` | `<project>/.vscode/mcp.json` | `<project>/.vscode/mcp.json` |
+| Antigravity (MCP-compatible) | Client settings MCP file (project or global) | Client settings MCP file (project or global) | Client settings MCP file (project or global) |
+
+<Note>
+If Antigravity exposes both global and workspace MCP config, prefer workspace config for team consistency and easier onboarding.
+</Note>
+
 <CodeGroup>
 ```json Claude Code / Claude Desktop
 {
