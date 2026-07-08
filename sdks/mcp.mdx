@@ -5,7 +5,7 @@ description: "Use VecTrade financial tools in Claude Code, Claude Desktop, Curso
 
 ## Overview
 
-The VecTrade MCP server provides **40+ financial and trading tools** to any AI IDE that supports the [Model Context Protocol](https://modelcontextprotocol.io/).
+The VecTrade MCP server currently provides **42 financial and trading tools** to any AI IDE that supports the [Model Context Protocol](https://modelcontextprotocol.io/).
 
 Supported clients: Claude Code, Claude Desktop, Cursor, VS Code Copilot, Windsurf, Cline, Continue.dev.
 
@@ -16,7 +16,7 @@ Supported clients: Claude Code, Claude Desktop, Cursor, VS Code Copilot, Windsur
 Add this to your IDE's MCP configuration:
 
 <CodeGroup>
-```json Claude Desktop (~/.config/claude/claude_desktop_config.json)
+```json Claude Desktop (macOS: ~/Library/Application Support/Claude/claude_desktop_config.json)
 {
   "mcpServers": {
     "vectrade": {
@@ -109,7 +109,7 @@ For Claude Code, treat the MCP server as your "plugin" layer:
 
 #### Optional Claude Code skill file
 
-If your team uses Claude Code skill prompts, add a repo-level skill such as `.claude/skills/vectrade/SKILL.md` with tool-intent patterns:
+If your team uses Claude Code skill prompts, add a repo-level skill such as `.claude/skills/vectrade/SKILL.md` (template available in the VecTrade MCP repo) with tool-intent patterns:
 
 ```md
 # VecTrade Skill
@@ -142,7 +142,7 @@ Use this table to find where to place each config snippet:
 
 | Client | macOS | Linux | Windows |
 |---|---|---|---|
-| Claude Code / Claude Desktop | `~/.config/claude/claude_desktop_config.json` | `~/.config/claude/claude_desktop_config.json` | `%APPDATA%/Claude/claude_desktop_config.json` |
+| Claude Code / Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` | `~/.config/claude/claude_desktop_config.json` | `%APPDATA%/Claude/claude_desktop_config.json` |
 | Cursor | `<project>/.cursor/mcp.json` | `<project>/.cursor/mcp.json` | `<project>/.cursor/mcp.json` |
 | VS Code / GitHub Copilot | `<project>/.vscode/mcp.json` | `<project>/.vscode/mcp.json` | `<project>/.vscode/mcp.json` |
 | Antigravity (MCP-compatible) | Client settings MCP file (project or global) | Client settings MCP file (project or global) | Client settings MCP file (project or global) |
