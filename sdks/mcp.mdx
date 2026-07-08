@@ -122,6 +122,123 @@ If your team uses Claude Code skill prompts, add a repo-level skill such as `.cl
 
 This keeps Claude Code behavior consistent across teammates while still using the same VecTrade MCP endpoint.
 
+## Works Across Antigravity, VS Code, Cursor, and Claude Code
+
+Yes. The same approach works for all MCP-compatible clients:
+
+1. Use the same hosted MCP endpoint: `https://mcp.vectrade.io/mcp`
+2. Pass a user API key in header: `X-API-Key: vq_...`
+3. Keep a stable server name (recommended: `vectrade`)
+4. Restart the client so it reloads MCP config
+5. Verify by calling one tool (for example, `get_quote`)
+
+### Client-specific config shapes
+
+Different clients use slightly different JSON keys (`mcpServers` vs `servers`).
+
+<CodeGroup>
+```json Claude Code / Claude Desktop
+{
+  "mcpServers": {
+    "vectrade": {
+      "url": "https://mcp.vectrade.io/mcp",
+      "headers": {
+        "X-API-Key": "vq_your_key_here"
+      }
+    }
+  }
+}
+```
+
+```json Cursor
+{
+  "mcpServers": {
+    "vectrade": {
+      "url": "https://mcp.vectrade.io/mcp",
+      "headers": {
+        "X-API-Key": "vq_your_key_here"
+      }
+    }
+  }
+}
+```
+
+```json VS Code / GitHub Copilot
+{
+  "servers": {
+    "vectrade": {
+      "url": "https://mcp.vectrade.io/mcp",
+      "headers": {
+        "X-API-Key": "vq_your_key_here"
+      }
+    }
+  }
+}
+```
+
+```json Antigravity (MCP-compatible)
+{
+  "mcpServers": {
+    "vectrade": {
+      "url": "https://mcp.vectrade.io/mcp",
+      "headers": {
+        "X-API-Key": "vq_your_key_here"
+      }
+    }
+  }
+}
+```
+</CodeGroup>
+
+If your Antigravity build uses a different top-level key, keep the same server object (`url`, `headers`, `X-API-Key`) and adapt only the wrapper key expected by that client version.
+
+## End-to-End User Guide
+
+### 1) Get API key
+
+- Go to [vectrade.io/vtrade/developer](https://vectrade.io/vtrade/developer)
+- Create or copy your key (`vq_...`)
+
+### 2) Add MCP server config
+
+- Pick the client block above (Claude Code, Cursor, VS Code, Antigravity)
+- Add `vectrade` server with endpoint `https://mcp.vectrade.io/mcp`
+- Set `X-API-Key`
+
+### 3) Optional trading tools
+
+- Add `VECTRADE_BOT_KEY=tvt_...` only when you need trading execution tools
+- Keep market-data key (`vq_...`) and bot key (`tvt_...`) separate
+
+### 4) Restart client and verify
+
+- Restart IDE/client
+- Ask: `Use get_quote for AAPL`
+- Confirm tool call returns data
+
+### 5) Run doctor checks (recommended)
+
+```bash
+vectrade mcp doctor
+```
+
+This validates key format, REST auth, MCP initialize, and tools/list.
+
+## Troubleshooting
+
+| Symptom | Likely Cause | Fix |
+|---|---|---|
+| `401 Unauthorized` | Missing/invalid `vq_` key | Re-copy key from developer portal and re-save config |
+| `Detected bot key (tvt_...)` | Bot key used as `X-API-Key` | Use `vq_...` for MCP auth; keep `tvt_...` only for trading env var |
+| `Server not initialized` | Client did not preserve MCP session | Reconnect/restart client; ensure client supports Streamable HTTP session flow |
+| `tools/list` returns empty | Key lacks access or upstream issue | Run `vectrade mcp doctor`; verify account plan and API key status |
+| `429 Too Many Requests` | Per-tier rate limit exceeded | Retry after cooldown or upgrade plan |
+| Works in one IDE, fails in another | Different config schema keys | Match client wrapper key (`mcpServers` vs `servers`) |
+| Trading tools unavailable | Missing `VECTRADE_BOT_KEY` | Add valid `tvt_...` key for trading tools |
+| Claude Code not showing tools | Config not reloaded | Restart Claude Code and re-open chat/session |
+
+If issues persist, include `vectrade mcp doctor` output when opening support requests.
+
 ## Available Tools
 
 ### Quotes & Market Data
