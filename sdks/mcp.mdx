@@ -1,13 +1,13 @@
 ---
 title: "MCP (AI IDEs)"
-description: "Use VecTrade financial tools in Claude Desktop, Cursor, VS Code, and other MCP-compatible clients"
+description: "Use VecTrade financial tools in Claude Code, Claude Desktop, Cursor, VS Code, and other MCP-compatible clients"
 ---
 
 ## Overview
 
-The VecTrade MCP server provides **22 financial & trading tools** to any AI IDE that supports the [Model Context Protocol](https://modelcontextprotocol.io/).
+The VecTrade MCP server provides **40+ financial and trading tools** to any AI IDE that supports the [Model Context Protocol](https://modelcontextprotocol.io/).
 
-Supported clients: Claude Desktop, Cursor, VS Code Copilot, Windsurf, Cline, Continue.dev.
+Supported clients: Claude Code, Claude Desktop, Cursor, VS Code Copilot, Windsurf, Cline, Continue.dev.
 
 ## Quick Setup
 
@@ -20,7 +20,7 @@ Add this to your IDE's MCP configuration:
 {
   "mcpServers": {
     "vectrade": {
-      "url": "https://mcp.vectrade.io/sse",
+      "url": "https://mcp.vectrade.io/mcp",
       "headers": {
         "X-API-Key": "vq_your_key_here"
       }
@@ -33,7 +33,7 @@ Add this to your IDE's MCP configuration:
 {
   "mcpServers": {
     "vectrade": {
-      "url": "https://mcp.vectrade.io/sse",
+      "url": "https://mcp.vectrade.io/mcp",
       "headers": {
         "X-API-Key": "vq_your_key_here"
       }
@@ -46,7 +46,7 @@ Add this to your IDE's MCP configuration:
 {
   "servers": {
     "vectrade": {
-      "url": "https://mcp.vectrade.io/sse",
+      "url": "https://mcp.vectrade.io/mcp",
       "headers": {
         "X-API-Key": "vq_your_key_here"
       }
@@ -78,11 +78,51 @@ If you have the [VecTrade CLI](/sdks/cli):
 
 ```bash
 vectrade mcp setup cursor
-vectrade mcp setup claude
+vectrade mcp setup claude-code
 vectrade mcp setup vscode
+vectrade mcp doctor
 ```
 
-## Available Tools (22)
+### Claude Code: Plugin, Tools, MCP, and Skills
+
+For Claude Code, treat the MCP server as your "plugin" layer:
+
+1. Add VecTrade MCP server (hosted endpoint or local `npx` server).
+2. Provide your user API key (`vq_...`) for market-data tools.
+3. Optionally add Bot key (`tvt_...`) for trading tools.
+4. Validate setup with `vectrade mcp doctor`.
+
+#### Recommended (hosted) for Claude Code
+
+```json
+{
+  "mcpServers": {
+    "vectrade": {
+      "url": "https://mcp.vectrade.io/mcp",
+      "headers": {
+        "X-API-Key": "vq_your_key_here"
+      }
+    }
+  }
+}
+```
+
+#### Optional Claude Code skill file
+
+If your team uses Claude Code skill prompts, add a repo-level skill such as `.claude/skills/vectrade/SKILL.md` with tool-intent patterns:
+
+```md
+# VecTrade Skill
+
+- Use `get_quote` for real-time price and volume.
+- Use `get_technicals` for RSI/MACD/support-resistance.
+- Use `get_news` and `get_sentiment` before proposing a trade thesis.
+- For execution, use trading tools only when `VECTRADE_BOT_KEY` is configured.
+```
+
+This keeps Claude Code behavior consistent across teammates while still using the same VecTrade MCP endpoint.
+
+## Available Tools
 
 ### Quotes & Market Data
 
