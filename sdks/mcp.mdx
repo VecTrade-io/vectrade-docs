@@ -122,6 +122,36 @@ If your team uses Claude Code skill prompts, add a repo-level skill such as `.cl
 
 This keeps Claude Code behavior consistent across teammates while still using the same VecTrade MCP endpoint.
 
+### Claude CLI Marketplace Install (one-time)
+
+If you use Claude CLI and want a one-command plugin install path:
+
+```bash
+claude plugin marketplace add VecTrade-io/vectrade-mcp
+claude plugin install vectrade-mcp-plugin@vectrade-tools
+```
+
+What this installs:
+
+- `vectrade-mcp-plugin` skill namespace for consistent trading prompts
+- plugin-bundled `.mcp.json` connector (local `npx @vectrade/mcp-server`)
+
+Required env vars before use:
+
+```bash
+export VECTRADE_API_KEY=vq_your_key_here
+# optional for trading tools
+export VECTRADE_BOT_KEY=tvt_your_bot_key
+```
+
+Then verify:
+
+```bash
+vectrade mcp doctor
+```
+
+For official public directory listing, submit via Anthropic plugin submission flow and community marketplace review.
+
 ## Works Across Antigravity, VS Code, Cursor, and Claude Code
 
 Yes. The same approach works for all MCP-compatible clients:
